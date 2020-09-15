@@ -6,7 +6,11 @@
 ## Dependency
 
 - header & lib
-  - boost
+  - [boost]
 - header only
-  - fmt
-  - catch2
+  - [fmt]
+  - [catch2]
+
+[boost]:<https://www.boost.org/>
+[catch2]:<https://github.com/catchorg/Catch2>
+[fmt]:<https://github.com/fmtlib/fmt>
