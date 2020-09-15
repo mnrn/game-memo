@@ -59,7 +59,7 @@ file(GLOB SOURCE *.cpp src/*.cpp include/*.hpp)
 # Function for building
 function(build DIR_NAME TARGET_NAME)
     # Main
-    file(GLOB SOURCE *.cpp src/*.cpp include/*.hpp ${DIR_NAME}/${TARGET_NAME}/*.cpp)
+    file(GLOB SOURCE *.cpp src/*.cpp include/*.hpp ${DIR_NAME}/${TARGET_NAME}/*.cpp ${DIR_NAME}/${TARGET_NAME}/*.hpp)
     set(MAIN_CPP ${TARGET_NAME}/main.cpp)
     if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${DIR_NAME}/${TARGET_NAME}/main.cpp)
         set(MAIN_CPP ${DIR_NAME}/${TARGET_NAME}/main.cpp)
