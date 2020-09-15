@@ -17,6 +17,7 @@
 #include "container.hpp"
 #include <algorithm>
 #include <cassert>
+#include <optional>
 
 //********************************************************************************
 // 構造体の定義
@@ -34,6 +35,10 @@ public:
     node *next;         /**< 単方向未使用リストL */
     Key key;            /**< キー */
     constexpr node() noexcept : left(nullptr), right(nullptr), next(nullptr) {}
+    template <class... Args>
+    constexpr explicit node(Args &&... args) noexcept
+        : left(nullptr), right(nullptr), next(nullptr),
+          key(std::forward<Args>(args)...) {}
     constexpr explicit node(const Key &key) noexcept
         : left(nullptr), right(nullptr), next(nullptr), key(key) {}
   };
@@ -45,28 +50,31 @@ public:
   ~skew_heap() noexcept { free_pool(); }
 
   /** @brief ねじれヒープHに要素xを挿入する @param const Key& key 要素xのキー */
-  void push(const Key &k) {
-    node *x = create_node(k);
+  template <class... Args> void push(Args &&... args) {
+    assert(!full());
+    node *x = create_node(std::forward<Args>(args)...);
     root_ = merge(root_, x);
     size_++;
   }
 
-  /**< @brief ねじれヒープHから先頭の要素を削除する */
-  void pop() {
+  /**< @brief ねじれヒープHから先頭のキーを取り出し、要素を削除する */
+  std::optional<Key> pop() noexcept {
+    if (empty() || root_ == nullptr) {
+      return std::nullopt;
+    }
+    Key k = root_->key;
     node *x = root_;
     root_ = merge(x->left, x->right);
     destroy_node(x);
     size_--;
+    return std::make_optional(k);
   }
 
-  /**< @brief ねじれヒープHの先頭からキーを取得する */
-  Key top() noexcept { return root_->key; }
-
   /**< @brief ねじれヒープHが空かどうか返す */
-  bool empty() noexcept { return root_ == nullptr; }
+  constexpr bool empty() const noexcept { return root_ == nullptr; }
 
   /**< @brief ねじれヒープHが満杯かどうか返す */
-  bool full() noexcept { return size_ == cap_; }
+  constexpr bool full() const noexcept { return size_ == cap_; }
 
 private:
   /**
@@ -92,10 +100,10 @@ private:
   }
 
   /**< @brief 節点xの記憶領域の確保を行う */
-  node *create_node(const Key &k) {
+  template <class... Args> node *create_node(Args &&... args) {
     node *x = free_;
     free_ = x->next;
-    return new (x) node(k);
+    return construct(x, std::forward<Args>(args)...);
   }
 
   /**< @brief 節点xの記憶領域の解放を行う */
@@ -107,7 +115,7 @@ private:
 
   /**< @brief 節点n個分の記憶領域を確保する */
   node *allocate_nodes(std::size_t n) {
-    return static_cast<node *>(::operator new(sizeof(node) * n));
+    return static_cast<node *>(::operator new(sizeof(node) * n, std::nothrow));
   }
 
   /**< @brief 節点xの記憶領域を解放する */
@@ -133,13 +141,19 @@ private:
 
   /**< @brief メモリプールの確保 */
   void allocate_pool(std::size_t n) {
-    cap_ = n;
+    if (n == 0) {
+      return;
+    }
     pool_ = allocate_nodes(n);
+    if (pool_ == nullptr) {
+      return;
+    }
     for (std::size_t i = 0; i < n - 1; i++) {
       pool_[i].next = &pool_[i + 1];
     }
     pool_[n - 1].next = nullptr;
     free_ = pool_;
+    cap_ = n;
   }
 
 private:

@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
+#include <optional>
 #include <type_traits>
 
 //****************************************
@@ -36,26 +37,27 @@ public:
   ~queue() noexcept { free_queue(); };
 
   /**< @brief キューが空かどうか判定 */
-  bool empty() const noexcept { return head_ == tail_; }
+  constexpr bool empty() const noexcept { return head_ == tail_; }
 
   /**< @brief キューが満杯かどうか判定 */
-  bool full() const noexcept { return ((tail_ + 1) % cap_) == head_; }
+  constexpr bool full() const noexcept { return ((tail_ + 1) % cap_) == head_; }
 
   /**< @brief キューに要素xを挿入する */
   template <class... Args> void push(Args &&... args) {
     assert(!full()); // オーバーフローチェック
-    construct(Q[tail_],
-              T(std::forward<Args>(args)...)); // コンストラクタ呼び出し
-    tail_ = (tail_ + 1) % cap_;                // 循環処理
+    construct(Q[tail_], std::forward<Args>(args)...); // コンストラクタ呼び出し
+    tail_ = (tail_ + 1) % cap_;                       // 循環処理
   }
 
   /**< @brief キューから一番上の要素を削除する */
-  T pop() noexcept {
-    assert(!empty()); // アンダーフローチェック
+  std::optional<T> pop() noexcept {
+    if (empty()) { // アンダーフローチェック
+      return std::nullopt;
+    }
     decltype(auto) front = Q[head_];
     destroy(Q[head_]);          // デストラクタ呼び出し
     head_ = (head_ + 1) % cap_; // 循環処理
-    return front;
+    return std::make_optional(front);
   }
 
 private:

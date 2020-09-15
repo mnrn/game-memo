@@ -3,8 +3,6 @@
  * @date   2016/02/23
  */
 
-
-
 // ********************************************************************************
 // インクルードガードの始端
 // ********************************************************************************
@@ -12,32 +10,11 @@
 #ifndef CONTAINER_HPP
 #define CONTAINER_HPP
 
-
-
 // ********************************************************************************
 // 必要なヘッダファイルのインクルード
 // ********************************************************************************
 
 #include <type_traits>
-
-
-
-// ********************************************************************************
-// マクロの定義
-// ********************************************************************************
-
-#define CONTAINER_BEGIN namespace container {
-#define CONTAINER_END   }
-
-
-
-// ********************************************************************************
-// 名前空間の始端
-// ********************************************************************************
-
-CONTAINER_BEGIN
-
-
 
 // ********************************************************************************
 // 関数の定義
@@ -46,42 +23,27 @@ CONTAINER_BEGIN
 /**
  * @brief placement newを使用した生成用ヘルパ関数
  */
-template <typename T, typename... Args>
-void construct(T& t, Args&&... args)
-{
-    new(&t)T(std::forward<Args>(args)...);
+template <typename T, typename... Args> void construct(T &t, Args &&... args) {
+  new (&t) T(std::forward<Args>(args)...);
 }
-
 
 /**
  * @brief 明示的にデストラクタを呼び出す破棄用ヘルパ関数
  */
-template <typename T,
-        typename std::enable_if<!std::is_trivially_destructible<T>::value>::type* = nullptr>
-void destroy(const T& t) noexcept
-{
-    t.~T();
+template <typename T, typename std::enable_if<!std::is_trivially_destructible<
+                          T>::value>::type * = nullptr>
+void destroy(const T &t) noexcept {
+  t.~T();
 }
 
-template <typename T,
-        typename std::enable_if<std::is_trivially_destructible<T>::value>::type* = nullptr>
-void destroy(const T& t) noexcept
-{
-    (void)t;
+template <typename T, typename std::enable_if<std::is_trivially_destructible<
+                          T>::value>::type * = nullptr>
+void destroy(const T &t) noexcept {
+  (void)t;
 }
-
-
-
-// ********************************************************************************
-// 名前空間の終端
-// ********************************************************************************
-
-CONTAINER_END
-
-
 
 // ********************************************************************************
 // インクルードガードの終端
 // ********************************************************************************
 
-#endif  // CONTAINER_HPP
+#endif // CONTAINER_HPP
