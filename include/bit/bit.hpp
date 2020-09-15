@@ -1,7 +1,6 @@
 /**
- * @brief  ビット演算に関する記述
- * @note   参考URL: https://en.wikipedia.org/wiki/Circular_shift
- * @date   2016/08/16
+ * @brief  Bitwise Operations
+ * @note   Reference URL: https://en.wikipedia.org/wiki/Circular_shift
  */
 
 // ********************************************************************************
@@ -10,6 +9,11 @@
 
 #ifndef BIT_HPP
 #define BIT_HPP
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wimplicit-int-conversion"
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wold-style-cast"
 
 // ********************************************************************************
 // Include files
@@ -40,49 +44,38 @@ static inline std::int32_t nlz(std::uint32_t v) {
   union {
     std::uint64_t asu64;
     double asf64;
-  } u;                       // 無名共用体を準備
-  u.asf64 = (double)v + 0.5; // 0は例外表現なので0.5(1.0 * 2^(-1))を加算しておく
-  return 1054 - (u.asu64 >> 52); // 1054(ゲタ(bias)の数+32-1) - vの指数部を返す
+  } u; // 無名共用体を準備
+  u.asf64 =
+      (double)v + 0.5; // 0は例外表現なので0.5(=1.0 * 2^(-1))を加算しておく
+  return 1054 - (u.asu64 >> 52); // 1054(=ゲタ(bias)の数+32-1) - vの指数部を返す
 }
 
 /**
- * @brief ビットの左ローテーション
- * @param Integer x   ローテーション対象の値(符号なし整数)
- * @param uint32_t n  シフトする値
+ * @brief In left rotation, the bits that fall off at left end are put back at
+ * right end.
+ * @param Integer x   Rotation value
+ * @param uint32_t n  Shift count
  */
-template <
-    typename Integer,
-    typename std::enable_if<std::is_unsigned<Integer>::value>::type * = nullptr>
-constexpr Integer rotl(Integer x, std::uint32_t n) {
-  return (x << n) | (x >> ((sizeof(Integer) * CHAR_BIT - 1) & (-n)));
-}
-
-template <
-    typename Integer,
-    typename std::enable_if<std::is_signed<Integer>::value>::type * = nullptr>
-constexpr typename std::make_unsigned<Integer>::type rotl(Integer x,
-                                                          std::uint32_t n) {
-  return rotl(static_cast<typename std::make_unsigned<Integer>::type>(x), n);
+template <typename Integer> constexpr Integer rotl(Integer x, std::uint32_t n) {
+  if constexpr (std::is_unsigned_v<Integer>) {
+    return (x << n) | (x >> ((sizeof(Integer) * CHAR_BIT - 1) & (-n)));
+  } else if constexpr (std::is_signed_v<Integer>) {
+    return rotl(static_cast<typename std::make_unsigned_t<Integer>>(x), n);
+  }
 }
 
 /**
- * @brief ビットの右ローテーション
- * @param Integer x   ローテーション対象の値(符号なし整数)
- * @param uint32_t n  シフトする値
+ * @brief In right rotation, the bits that fall off at right end are put back at
+ * left end.
+ * @param Integer x   Rotation value
+ * @param uint32_t n  Shift count
  */
-template <
-    typename Integer,
-    typename std::enable_if<std::is_unsigned<Integer>::value>::type * = nullptr>
-constexpr Integer rotr(Integer x, std::uint32_t n) {
-  return (x >> n) | (x << ((sizeof(Integer) * CHAR_BIT - 1) & (-n)));
-}
-
-template <
-    typename Integer,
-    typename std::enable_if<std::is_signed<Integer>::value>::type * = nullptr>
-constexpr typename std::make_unsigned<Integer>::type rotr(Integer x,
-                                                          std::uint32_t n) {
-  return rotr(static_cast<typename std::make_unsigned<Integer>::type>(x), n);
+template <typename Integer> constexpr Integer rotr(Integer x, std::uint32_t n) {
+  if constexpr (std::is_unsigned_v<Integer>) {
+    return (x >> n) | (x << ((sizeof(Integer) * CHAR_BIT - 1) & (-n)));
+  } else if constexpr (std::is_signed_v<Integer>) {
+    return rotr(static_cast<typename std::make_unsigned_t<Integer>>(x), n);
+  }
 }
 
 /**
@@ -121,6 +114,8 @@ constexpr Integer maj(Integer x, Integer y, Integer z) {
 // ********************************************************************************
 
 } // namespace bit
+
+#pragma clang diagnostic pop
 
 // ********************************************************************************
 // インクルードガードの終端

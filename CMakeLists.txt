@@ -99,5 +99,6 @@ set(TARGETS
 buildAll()
 
 set(TEST_TARGETS
+    bit
 )
 testAll()
