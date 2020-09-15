@@ -11,6 +11,7 @@
 
 #include "state.hpp"
 #include <algorithm>
+#include <boost/noncopyable.hpp>
 #include <functional>
 #include <iterator>
 #include <optional>
@@ -20,7 +21,7 @@
 // クラスの定義
 //********************************************************************************
 
-template <typename T> struct state_machine {
+template <typename T> struct state_machine : private boost::noncopyable {
 public:
   state_machine(std::shared_ptr<T> owner, const state<T> &init)
       : owner_(owner), current_(init) {}
