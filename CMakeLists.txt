@@ -4,7 +4,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
 
 # TODO: cmake_template -> your project name
-set(PROJECT_NAME utils)
+set(PROJECT_NAME memo)
 project(${PROJECT_NAME})
 
 
