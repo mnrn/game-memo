@@ -10,6 +10,7 @@ project(${PROJECT_NAME})
 
 # Include dirctories
 set(PROJECTS_DIR_NAME projects)
+set(TESTS_DIR_NAME tests)
 include_directories(external)
 include_directories(header)
 include_directories(src)
@@ -56,12 +57,12 @@ file(GLOB SOURCE *.cpp src/*.cpp header/*.hpp)
 
 
 # Function for building
-function(build TARGET_NAME)
+function(build DIR_NAME TARGET_NAME)
     # Main
-    file(GLOB SOURCE *.cpp src/*.cpp header/*.hpp ${PROJECTS_DIR_NAME}/${TARGET_NAME}/*.cpp)
+    file(GLOB SOURCE *.cpp src/*.cpp header/*.hpp ${DIR_NAME}/${TARGET_NAME}/*.cpp)
     set(MAIN_CPP ${TARGET_NAME}/main.cpp)
-    if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECTS_DIR_NAME}/${TARGET_NAME}/main.cpp)
-        set(MAIN_CPP ${PROJECTS_DIR_NAME}/${TARGET_NAME}/main.cpp)
+    if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${DIR_NAME}/${TARGET_NAME}/main.cpp)
+        set(MAIN_CPP ${DIR_NAME}/${TARGET_NAME}/main.cpp)
     endif()
 
     add_executable(${TARGET_NAME}
@@ -74,14 +75,19 @@ function(build TARGET_NAME)
     )
 endfunction(build)
 
-
 # Build All
 function(buildAll)
     foreach(TARGET ${TARGETS})
-        build(${TARGET})
+        build(${PROJECTS_DIR_NAME} ${TARGET})
     endforeach(TARGET)
 endfunction(buildAll)
 
+# Test All
+function(testAll)
+    foreach(TEST_TARGET ${TEST_TARGETS})
+        build(${TESTS_DIR_NAME} ${TEST_TARGET})
+    endforeach(TEST_TARGET)
+endfunction(testAll)
 
 #link_libraries(${} ${})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/")
@@ -91,3 +97,7 @@ set(TARGETS
     hello
 )
 buildAll()
+
+set(TEST_TARGETS
+)
+testAll()
