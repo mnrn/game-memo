@@ -104,11 +104,13 @@ template <typename Integer1, typename Integer2, typename Integer3,
                                   std::is_unsigned<Integer2>::value &&
                                   std::is_integral<Integer3>::value>::type * =
               nullptr>
-constexpr auto modpow(const Integer1 &a, const Integer2 &b, const Integer3 &n) {
-  return b == 0 ? 1        // 再帰基底部
-                : b & 0x01 // bの最下位ビットが1か否か判定
-                      ? mod(modpow(mod(a * a, n), b >> 1, n) * a, n) // 奇数処理
-                      : modpow(mod(a * a, n), b >> 1, n); // 偶数処理
+constexpr auto mod_pow(const Integer1 &a, const Integer2 &b,
+                       const Integer3 &n) {
+  return b == 0
+             ? 1        // 再帰基底部
+             : b & 0x01 // bの最下位ビットが1か否か判定
+                   ? mod(mod_pow(mod(a * a, n), b >> 1, n) * a, n) // 奇数処理
+                   : mod_pow(mod(a * a, n), b >> 1, n); // 偶数処理
 }
 
 template <typename Integer1, typename Integer2, typename Integer3,
@@ -116,9 +118,10 @@ template <typename Integer1, typename Integer2, typename Integer3,
                                   std::is_signed<Integer2>::value &&
                                   std::is_integral<Integer3>::value>::type * =
               nullptr>
-constexpr auto modpow(const Integer1 &a, const Integer2 &b, const Integer3 &n) {
-  return modpow(a, static_cast<typename std::make_unsigned<Integer2>::type>(b),
-                n);
+constexpr auto mod_pow(const Integer1 &a, const Integer2 &b,
+                       const Integer3 &n) {
+  return mod_pow(a, static_cast<typename std::make_unsigned<Integer2>::type>(b),
+                 n);
 }
 
 } // namespace arith
