@@ -10,9 +10,9 @@ project(${PROJECT_NAME})
 
 # Include dirctories
 set(PROJECTS_DIR_NAME projects)
-set(TESTS_DIR_NAME tests)
+set(TESTS_DIR_NAME test)
 include_directories(external)
-include_directories(header)
+include_directories(include)
 include_directories(src)
 
 
@@ -53,13 +53,13 @@ endif()
 
 
 add_definitions(-std=c++17)
-file(GLOB SOURCE *.cpp src/*.cpp header/*.hpp)
+file(GLOB SOURCE *.cpp src/*.cpp include/*.hpp)
 
 
 # Function for building
 function(build DIR_NAME TARGET_NAME)
     # Main
-    file(GLOB SOURCE *.cpp src/*.cpp header/*.hpp ${DIR_NAME}/${TARGET_NAME}/*.cpp)
+    file(GLOB SOURCE *.cpp src/*.cpp include/*.hpp ${DIR_NAME}/${TARGET_NAME}/*.cpp)
     set(MAIN_CPP ${TARGET_NAME}/main.cpp)
     if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${DIR_NAME}/${TARGET_NAME}/main.cpp)
         set(MAIN_CPP ${DIR_NAME}/${TARGET_NAME}/main.cpp)
