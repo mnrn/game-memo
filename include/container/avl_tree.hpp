@@ -110,6 +110,7 @@ template <class Key, class T, class Compare = std::less<Key>> struct avl_tree {
    * @param const Key& k キーk
    */
   void erase(const Key &k) {
+    assert(root_ != nullptr);
     root_ = erase(root_, k);
     size_--;
   }
