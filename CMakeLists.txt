@@ -4,7 +4,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
 
 # TODO: cmake_template -> your project name
-set(PROJECT_NAME game_utils)
+set(PROJECT_NAME utils)
 project(${PROJECT_NAME})
 
 
