@@ -74,11 +74,9 @@ public:
   /**< @brief random number generators with periods 2^128 - 1 */
   std::uint32_t xorshift128() {
     const std::uint32_t t = (x ^ (x << 11));
-
     x = y;
     y = z;
     z = w;
-
     return (w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)));
   }
 
@@ -87,7 +85,6 @@ public:
     v ^= v >> 12;
     v ^= v << 25;
     v ^= v >> 27;
-
     return v * 2685821657736338717ULL;
   }
 
@@ -95,10 +92,8 @@ public:
   std::uint64_t xorshift1024star() {
     const std::uint64_t s0 = s[p];
     std::uint64_t s1 = s[p = (p + 1) & 0x0f];
-
     s1 ^= s1 << 31;
     s[p] = s1 ^ s0 ^ (s1 >> 11) ^ (s0 >> 30);
-
     return s[p] * 11811783497276652981ULL;
   }
 
@@ -106,11 +101,9 @@ public:
   std::uint64_t xorshift128plus() {
     std::uint64_t s1 = t[0];
     const std::uint64_t s0 = t[1];
-
     t[0] = s0;
     s1 ^= s1 << 23;
     t[1] = s1 ^ s0 ^ (s1 >> 18) ^ (s0 >> 5);
-
     return t[1] + s0;
   }
 

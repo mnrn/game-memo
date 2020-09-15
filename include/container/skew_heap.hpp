@@ -1,6 +1,5 @@
 /**
  * @brief  ねじれヒープ
- * @date   2016/05/14 ~ 2016/05/15
  */
 
 //********************************************************************************
@@ -30,6 +29,7 @@
  */
 template <class Key, class Compare = std::less<Key>> struct skew_heap {
 public:
+  static_assert(std::is_nothrow_constructible_v<Key>);
   struct node {
     node *left, *right; /**< 左右の子 */
     node *next;         /**< 単方向未使用リストL */
