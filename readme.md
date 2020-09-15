@@ -3,6 +3,23 @@
 ゲームで役立つ知識のコードをメモしています。  
 実装は C++ ですが、他の言語でもすぐ応用できるようなものが多いです。
 
+## Build
+
+```shell
+cmake --no-warn-unused-cli -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_BUILD_TYPE:STRING=Debug -H/path/to/ -B/path/to/build -G "Unix Makefiles"
+cmake --build /path/to/build
+```
+
+今の所、MS には対応していませんが、そのうち対応させようかと考えています。
+
+## Dependency
+
+- header & lib
+  - [boost]
+- header only
+  - [fmt]
+  - [catch2]
+
 ## Directory tree
 
 ```text:
@@ -55,23 +72,6 @@
    ├── test2
    └── ...
 ```
-
-## Build
-
-```shell
-cmake --no-warn-unused-cli -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_BUILD_TYPE:STRING=Debug -H/path/to/ -B/path/to/build -G "Unix Makefiles"
-cmake --build /path/to/build
-```
-
-今の所、MS には対応していませんが、そのうち対応させようかと考えています。
-
-## Dependency
-
-- header & lib
-  - [boost]
-- header only
-  - [fmt]
-  - [catch2]
 
 [boost]:<https://www.boost.org/>
 [catch2]:<https://github.com/catchorg/Catch2>
