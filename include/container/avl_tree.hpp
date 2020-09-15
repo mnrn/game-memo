@@ -10,8 +10,6 @@
  *        n個のAVL木の高さはΟ(lgn)であることがわかる
  *
  * @note  今回は属性pを省略してコードの簡略化を図ることにする
- *
- * @date  2016/02/07 ~ 2016/05/15
  */
 
 //****************************************
@@ -41,7 +39,8 @@
  * @tparam Compare キーを引数にとる比較述語の型
  */
 template <class Key, class T, class Compare = std::less<Key>> struct avl_tree {
-
+  static_assert(std::is_nothrow_constructible_v<Key> &&
+                std::is_nothrow_constructible_v<T>);
   using height_t = std::int32_t;
   using sides_t = std::int32_t;
   using pair_t = std::pair<const Key, T>;
@@ -111,6 +110,7 @@ template <class Key, class T, class Compare = std::less<Key>> struct avl_tree {
    * @param const Key& k キーk
    */
   void erase(const Key &k) {
+    assert(root_ != nullptr);
     root_ = erase(root_, k);
     size_--;
   }
