@@ -73,13 +73,8 @@ private:
   // 静的メンバ変数
   // --------------------------------------------------------------------------------
 
-  static std::unique_ptr<T> instance_; /**< インスタンス本体   */
+  static inline std::unique_ptr<T> instance_ =
+      nullptr; /**< インスタンス本体   */
 };
 
-// --------------------------------------------------------------------------------
-// 静的メンバ変数の定義
-// --------------------------------------------------------------------------------
-
-template <class T> std::unique_ptr<T> singleton<T>::instance_ = nullptr;
-
-#endif // end of __SINGLETON_HPP__
+#endif // end of SINGLETON_HPP
