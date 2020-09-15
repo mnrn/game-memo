@@ -27,6 +27,7 @@
 
 #include "container.hpp"
 #include <algorithm>
+#include <optional>
 #include <utility>
 
 //****************************************
@@ -58,7 +59,7 @@ template <class Key, class T, class Compare = std::less<Key>> struct avl_tree {
       const Key key;             /**< キー    */
       const char d[sizeof(Key)]; /**< ダミー  */
     };
-    T value;    /**< 付属データ */
+    T v;        /**< 付属データ */
     node *next; /**< 単方向未使用リストL */
 
     constexpr node() noexcept
@@ -66,8 +67,7 @@ template <class Key, class T, class Compare = std::less<Key>> struct avl_tree {
     constexpr explicit node(const Key &k) noexcept
         : left(nullptr), right(nullptr), h(1), key(k), next(nullptr) {}
     constexpr node(const Key &k, const T &v) noexcept
-        : left(nullptr), right(nullptr), h(1), key(k), value(v), next(nullptr) {
-    }
+        : left(nullptr), right(nullptr), h(1), key(k), v(v), next(nullptr) {}
   };
 
   node *root_;  /**< AVL木の根 */
@@ -100,6 +100,7 @@ template <class Key, class T, class Compare = std::less<Key>> struct avl_tree {
    */
   void insert(const Key &k, const T &v) {
     node *z = create_node(k, v);
+    assert(z != nullptr);
     root_ = insert(root_, z);
     size_++;
   }
@@ -120,7 +121,7 @@ template <class Key, class T, class Compare = std::less<Key>> struct avl_tree {
    * @param  const Key& k キーk
    * @return キーkに対応する付属データ
    */
-  T *find(const Key &k) { return find(root_, k); }
+  std::optional<T> find(const Key &k) { return find(root_, k); }
 
 private:
   /**
@@ -146,7 +147,7 @@ private:
    * @param  const Key& k キーk
    * @return キーkに対応する付属データへのポインタ
    */
-  T *find(node *x, const Key &k) {
+  std::optional<T> find(node *x, const Key &k) {
     while (x != nullptr && neq(x->key, k)) {
       if (cmp_(x->key, k)) {
         x = x->left;
@@ -154,7 +155,7 @@ private:
         x = x->right;
       }
     }
-    return x->v;
+    return x == nullptr ? std::nullopt : std::make_optional(x->v);
   }
 
   /**
@@ -284,9 +285,12 @@ private:
 private:
   /**< @brief 節点xの記憶領域の確保を行う */
   node *create_node(const Key &k, const T &v) {
+    if (free_ == nullptr) {
+      return nullptr;
+    }
     node *x = free_;
     free_ = x->next;
-    return new (x) node(k, v);
+    return construct(x, k, v);
   }
 
   /**< @brief 節点xの記憶領域の解放を行う */
@@ -298,7 +302,7 @@ private:
 
   /**< @brief 節点n個分の記憶領域を確保する */
   node *allocate_nodes(std::size_t n) {
-    return static_cast<node *>(::operator new(sizeof(node) * n));
+    return static_cast<node *>(::operator new(sizeof(node) * n, std::nothrow));
   }
 
   /**< @brief 節点xの記憶領域を解放する */
@@ -324,13 +328,19 @@ private:
 
   /**< @brief メモリプールの確保 */
   void allocate_pool(std::size_t n) {
-    cap_ = n;
+    if (n == 0) {
+      return;
+    }
     pool_ = allocate_nodes(n); // 節点n個分の記憶領域確保
+    if (pool_ == nullptr) {
+      return;
+    }
     for (std::size_t i = 0; i < n - 1; i++) {
       pool_[i].next = &pool_[i + 1];
     }
     pool_[n - 1].next = nullptr;
     free_ = pool_; // 空き節点へのポインタを保持しておく
+    cap_ = n;
   }
 
 private:

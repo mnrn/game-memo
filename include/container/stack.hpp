@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
+#include <optional>
 #include <type_traits>
 
 //****************************************
@@ -36,28 +37,30 @@ public:
   ~stack() noexcept { free_stack(); }
 
   /**< @brief スタックが空かどうかを返す */
-  bool empty() const noexcept { return top_ == 0; }
+  constexpr bool empty() const noexcept { return top_ == 0; }
 
   /**< @brief スタックが満杯かどうか返す */
-  bool full() const noexcept { return top_ >= (cap_); }
+  constexpr bool full() const noexcept { return top_ >= cap_; }
 
   /**< @brief スタックにxを挿入する  */
   template <class... Args> void push(Args &&... args) {
     assert(!full()); // オーバーフローチェック
     construct(S[top_++],
-              T(std::forward<Args>(args)...)); // コンストラクタ呼び出し
+              std::forward<Args>(args)...); // コンストラクタ呼び出し
   }
 
   /**< @brief スタックから一番上の要素を削除する */
-  T pop() noexcept {
-    assert(!empty()); // アンダーフローチェック
+  std::optional<T> pop() noexcept {
+    if (empty()) { // アンダーフローチェック
+      return std::nullopt;
+    }
     decltype(auto) top = S[top_ - 1];
     destroy(S[--top_]); // デストラクタ呼び出し
-    return top;
+    return std::make_optional(top);
   }
 
   /**< @brief スタックのサイズを返す */
-  std::size_t size() const noexcept { return top_; }
+  constexpr std::size_t size() const noexcept { return top_; }
 
 private:
   std::size_t top_; /**< スタックトップ */
