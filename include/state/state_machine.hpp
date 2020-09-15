@@ -37,7 +37,7 @@ public:
   }
 
   void update() {
-    auto states = {current_, global_};
+    decltype(auto) states = {current_, global_};
     for (auto &&state : states) {
       if (state && owner_) {
         state.exec(*owner_.get());
