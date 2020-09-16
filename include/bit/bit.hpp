@@ -10,17 +10,13 @@
 #ifndef BIT_HPP
 #define BIT_HPP
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wimplicit-int-conversion"
-#pragma clang diagnostic ignored "-Wsign-conversion"
-#pragma clang diagnostic ignored "-Wold-style-cast"
-
 // ********************************************************************************
 // Include files
 // ********************************************************************************
 
 #include <climits>
 #include <cstdint>
+#include <numeric>
 #include <type_traits>
 
 // ********************************************************************************
@@ -38,17 +34,19 @@ namespace bit {
  * @note   IEEE 754形式をサポートしているアーキテクチャにのみ対応
  * @note   エンディアンはリトル、ビッグどちらにも対応
  * @param  std::uint32_t v 符号なし整数v
- * @return vのゼロの数
+ * @return vの先頭から続くゼロの数
  */
-static inline std::int32_t nlz(std::uint32_t v) {
-  union {
+static constexpr inline std::int32_t nlz(std::uint32_t v) {
+  static_assert(
+      std::numeric_limits<double>::is_iec559,
+      "only support IEC 559 (IEEE 754) double precision floationg point.");
+  union anonymous {
     std::uint64_t asu64;
     double asf64;
-  } u; // 無名共用体を準備
-  u.asf64 =
-      (double)v + 0.5; // 0は例外表現なので0.5(=1.0 * 2^(-1))を加算しておく
+    constexpr explicit anonymous(double d) : asf64(d){};
+  } u((double)v + 0.5); // 0は例外表現なので0.5(=1.0 * 2^(-1))を加算しておく
   return 1054 - (u.asu64 >> 52); // 1054(=ゲタ(bias)の数+32-1) - vの指数部を返す
-}
+} // namespace bit
 
 /**
  * @brief In left rotation, the bits that fall off at left end are put back at
@@ -109,16 +107,6 @@ constexpr Integer maj(Integer x, Integer y, Integer z) {
   return (x & y) ^ (y & z) ^ (z & x);
 }
 
-// ********************************************************************************
-// 名前空間の終端
-// ********************************************************************************
-
 } // namespace bit
-
-#pragma clang diagnostic pop
-
-// ********************************************************************************
-// インクルードガードの終端
-// ********************************************************************************
 
 #endif // BIT_HPP

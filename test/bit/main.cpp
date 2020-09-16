@@ -3,7 +3,7 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-TEST_CASE("bit rotate algorithm", "[bit_rotate]") {
+TEST_CASE("Circular shift") {
   REQUIRE(bit::rotl(16, 2) == 64);
   REQUIRE(bit::rotr(16, 2) == 4);
 
@@ -23,4 +23,12 @@ TEST_CASE("bit rotate algorithm", "[bit_rotate]") {
 
   constexpr auto v5 = bit::rotl(v4, 3);
   REQUIRE(v5 == 0b1001'0110);
+}
+
+TEST_CASE("Number of Leading Zero (NLZ)") {
+  REQUIRE(bit::nlz(0b0) == 32);
+  REQUIRE(bit::nlz(0b01) == 31);
+  REQUIRE(bit::nlz(0b0000'0000'0000'0000'1000'0000'0000'1000) == 16);
+  REQUIRE(bit::nlz(0b0000'0000'0000'0000'1000'0000'0000'1000) ==
+          bit::nlz(0b1000'0000'0000'1000));
 }

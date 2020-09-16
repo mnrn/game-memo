@@ -25,13 +25,13 @@
 #define TOLARANCE_COMPARE_END }
 
 #define FULFILL_ASSERT(type1, type2, type3)                                    \
-  static_assert(std::numeric_limits<type1> is_iec559,                          \
+  static_assert(std::numeric_limits<type1>::is_iec559,                         \
                 "only makes sence for floating point types " #type1            \
                 "which fulfill the requirement of IEC 559(IEEE 754).");        \
-  static_assert(std::numeric_limits<type2> is_iec559,                          \
+  static_assert(std::numeric_limits<type2>::is_iec559,                         \
                 "only makes sence for floating point types " #type2            \
                 "which fulfill the requirement of IEC 559(IEEE 754).");        \
-  static_assert(std::numeric_limits<type3> is_iec559,                          \
+  static_assert(std::numeric_limits<type3>::is_iec559,                         \
                 "only makes sence for floating point types " #type3            \
                 "which fulfill the requirement of IEC 559(IEEE 754).");
 
