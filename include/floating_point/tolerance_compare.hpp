@@ -7,8 +7,8 @@
 // インクルードガード
 // ********************************************************************************
 
-#ifndef TOLARANCE_COMPARE_HPP
-#define TOLARANCE_COMPARE_HPP
+#ifndef TOLERANCE_COMPARE_HPP
+#define TOLERANCE_COMPARE_HPP
 
 // ********************************************************************************
 // 必要なヘッダファイルのインクルード
@@ -21,8 +21,8 @@
 // マクロの定義
 // ********************************************************************************
 
-#define TOLARANCE_COMPARE_BEGIN namespace tolarance_compare {
-#define TOLARANCE_COMPARE_END }
+#define TOLERANCE_COMPARE_BEGIN namespace tolerance_compare {
+#define TOLERANCE_COMPARE_END }
 
 #define FULFILL_ASSERT(type1, type2, type3)                                    \
   static_assert(std::numeric_limits<type1>::is_iec559,                         \
@@ -39,7 +39,7 @@
 // 名前空間の始端
 // ********************************************************************************
 
-TOLARANCE_COMPARE_BEGIN
+TOLERANCE_COMPARE_BEGIN
 
 // ********************************************************************************
 // 関数の定義
@@ -67,7 +67,7 @@ TOLARANCE_COMPARE_BEGIN
  *         許容誤差の値をそれに応じて設定することができる場合にのみ利用するべきである
  */
 template <typename Float1, typename Float2, typename Float3>
-bool absolute(Float1 x, Float2 y, Float3 epsilon) {
+constexpr inline bool absolute(Float1 x, Float2 y, Float3 epsilon) {
   FULFILL_ASSERT(Float1, Float2, Float3);
   return std::fabs(x - y) <= epsilon;
 }
@@ -97,7 +97,7 @@ bool absolute(Float1 x, Float2 y, Float3 epsilon) {
  *         イプシロンはより小さくないと効力がなくなってしまい、それらの数値が小さくなるほど式を成立させるのに必要な桁数はより多く必要になる
  */
 template <typename Float1, typename Float2, typename Float3>
-bool relative(Float1 x, Float2 y, Float3 epsilon) {
+constexpr inline bool relative(Float1 x, Float2 y, Float3 epsilon) {
   FULFILL_ASSERT(Float1, Float2, Float3);
   return std::fabs(x - y) <= epsilon * std::max(std::fabs(x), std::fabs(y));
 }
@@ -110,7 +110,7 @@ bool relative(Float1 x, Float2 y, Float3 epsilon) {
  * この式はMax()が機械語による命令によって利用できない場合には高価な計算になる可能性がある
  */
 template <typename Float1, typename Float2, typename Float3>
-bool combined(Float1 x, Float2 y, Float3 epsilon) {
+constexpr inline bool combined(Float1 x, Float2 y, Float3 epsilon) {
   FULFILL_ASSERT(Float1, Float2, Float3);
   return std::fabs(x - y) <=
          epsilon * std::max({std::fabs(x), std::fabs(y), 1.0});
@@ -120,7 +120,7 @@ bool combined(Float1 x, Float2 y, Float3 epsilon) {
  * @brief COMBINED-TOLERANCE-COMPAREより少ない労力で行える近似的な判定
  */
 template <typename Float1, typename Float2, typename Float3>
-bool approximate_combined(Float1 x, Float2 y, Float3 epsilon) {
+constexpr inline bool approximate_combined(Float1 x, Float2 y, Float3 epsilon) {
   FULFILL_ASSERT(Float1, Float2, Float3);
   return std::fabs(x - y) <= epsilon * (std::fabs(x) + std::fabs(y) + 1.0);
 }
@@ -129,15 +129,19 @@ bool approximate_combined(Float1 x, Float2 y, Float3 epsilon) {
  * @brief APPROXIMATE-COMBINED-TOLERANCE-COMPAREのエイリアス
  */
 template <typename Float1, typename Float2, typename Float3>
-bool float_eq(Float1 x, Float2 y, Float3 epsilon) {
+constexpr inline bool float_eq(Float1 x, Float2 y, Float3 epsilon) {
   return approximate_combined(x, y, epsilon);
+}
+
+template <typename Float> constexpr inline bool float_eq(Float x, Float y) {
+  return float_eq(x, y, std::numeric_limits<Float>::epsilon());
 }
 
 // ********************************************************************************
 // 名前空間の終端
 // ********************************************************************************
 
-TOLARANCE_COMPARE_END
+TOLERANCE_COMPARE_END
 
 // ********************************************************************************
 // マクロの無効化
@@ -145,4 +149,4 @@ TOLARANCE_COMPARE_END
 
 #undef FULFILL_ASSERT
 
-#endif // TOLARANCE_COMPARE_HPP
+#endif // TOLERANCE_COMPARE_HPP

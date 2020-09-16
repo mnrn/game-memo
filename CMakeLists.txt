@@ -91,5 +91,6 @@ buildAll()
 set(TEST_TARGETS
     bit
     sha
+    tolerance_compare
 )
 testAll()
