@@ -17,26 +17,25 @@
 #include <iostream>
 #endif
 
-class SHA384 {
+class sha384 {
 public:
   /**
    * @brief  SHA-384の計算を行う
    * @param  const std::string& msg ハッシュ化対象のascii文字列
    * @return ハッシュ化されたbyte列(digest message)
    */
-  std::vector<std::uint8_t> hash(const std::string &msg) const {
+  static inline std::vector<std::uint8_t> hash(const std::string &msg) {
     std::vector<std::uint8_t> bytes(msg.size(), 0x00);
     std::copy(msg.cbegin(), msg.cend(), bytes.begin());
     return hash(bytes);
   }
 
-public:
   /**
    * @brief  SHA-384の計算を行う
    * @param  const std::vector<std::uint8_t>& msg ハッシュ化対象のbyte列
    * @return ハッシュ化されたbyte列(digest message)
    */
-  std::vector<std::uint8_t> hash(const std::vector<std::uint8_t> &msg) const {
+  static std::vector<std::uint8_t> hash(const std::vector<std::uint8_t> &msg) {
     // ハッシュ値を用意
     std::vector<std::uint64_t> H{
         0xcbbb9d5dc1059ed8, 0x629a292a367cd507, 0x9159015a3070dd17,
@@ -169,8 +168,8 @@ private:
    *         01100001  01100010  01100011  1  00...00  00...011000
    *         a         b         c                          l = 24
    */
-  std::vector<std::uint8_t>
-  padding(const std::vector<std::uint8_t> &msg) const {
+  static std::vector<std::uint8_t>
+  padding(const std::vector<std::uint8_t> &msg) {
     // パディングすべき大きさを決定する
     const std::size_t msglen = msg.size();
     std::size_t padlen = 128 - (msglen % 128);
@@ -202,7 +201,7 @@ private:
    * @brief SHA-384およびSHA-512で使用する関数Σ{512}0(x)
    * @note  仕様書の式(4.10)に相当する
    */
-  constexpr std::uint64_t big_sigma512_0(std::uint64_t x) const {
+  static constexpr std::uint64_t big_sigma512_0(std::uint64_t x) {
     return bit::rotr(x, 28) ^ bit::rotr(x, 34) ^ bit::rotr(x, 39);
   }
 
@@ -210,7 +209,7 @@ private:
    * @brief SHA-384およびSHA-512で使用する関数Σ{512}1(x)
    * @note  仕様書の式(4.11)相当する
    */
-  constexpr std::uint64_t big_sigma512_1(std::uint64_t x) const {
+  static constexpr std::uint64_t big_sigma512_1(std::uint64_t x) {
     return bit::rotr(x, 14) ^ bit::rotr(x, 18) ^ bit::rotr(x, 41);
   }
 
@@ -218,7 +217,7 @@ private:
    * @brief SHA-384およびSHA-512で使用する関数σ{512}0(x)
    * @note  仕様書の式(4.12)に相当する
    */
-  constexpr std::uint64_t small_sigma512_0(std::uint64_t x) const {
+  static constexpr std::uint64_t small_sigma512_0(std::uint64_t x) {
     return bit::rotr(x, 1) ^ bit::rotr(x, 8) ^ (x >> 7);
   }
 
@@ -226,7 +225,7 @@ private:
    * @brief SHA-384およびSHA-512で使用する関数σ{512}1(x)
    * @note  仕様書の式(4.13)に相当する
    */
-  constexpr std::uint64_t small_sigma512_1(std::uint64_t x) const {
+  static constexpr std::uint64_t small_sigma512_1(std::uint64_t x) {
     return bit::rotr(x, 19) ^ bit::rotr(x, 61) ^ (x >> 6);
   }
 

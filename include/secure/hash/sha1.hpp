@@ -16,26 +16,25 @@
 #include <iostream>
 #endif
 
-class SHA1 {
+class sha1 {
 public:
   /**
    * @brief  SHA1(Secure Hash Algorithm 1)の計算を行う
    * @param  const std::string& msg ハッシュ化対象のascii文字列
    * @return ハッシュ化されたbyte列
    */
-  std::vector<std::uint8_t> hash(const std::string &msg) const {
+  static std::vector<std::uint8_t> hash(const std::string &msg) {
     std::vector<std::uint8_t> bytes(msg.size(), 0x00);
     std::copy(msg.cbegin(), msg.cend(), bytes.begin());
     return hash(bytes);
   }
 
-public:
   /**
    * @brief  SHA1(Secure Hash Algorithm 1)の計算を行う
    * @param  const std::vector<std::uint8_t>& msg ハッシュ化対象のbyte列
    * @return ハッシュ化されたbyte列
    */
-  std::vector<std::uint8_t> hash(const std::vector<std::uint8_t> &msg) const {
+  static std::vector<std::uint8_t> hash(const std::vector<std::uint8_t> &msg) {
     // ハッシュ値を用意
     std::vector<std::uint32_t> H{
         0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0,
@@ -136,8 +135,8 @@ private:
    *        01100001  01100010  01100011  1  00...00  00...011000
    *        a         b         c                          l = 24
    */
-  std::vector<std::uint8_t>
-  padding(const std::vector<std::uint8_t> &msg) const {
+  static std::vector<std::uint8_t>
+  padding(const std::vector<std::uint8_t> &msg) {
     // パディングすべき大きさを計算する
     const std::size_t msglen = msg.size();
     std::size_t padlen = 64 - (msglen % 64);
@@ -169,8 +168,8 @@ private:
    * @brief 論理関数ft(x, y, z)を定義する
    * @param t  0 <= t <= 79を満たすような整数(パラメタ)
    */
-  constexpr std::uint32_t f(std::uint32_t t, std::uint32_t x, std::uint32_t y,
-                            std::uint32_t z) const {
+  static constexpr std::uint32_t f(std::uint32_t t, std::uint32_t x,
+                                   std::uint32_t y, std::uint32_t z) {
     // if      (/*0<=t&&*/ t <= 19) { return ch(x, y, z);     }
     // else if (20 <= t && t <= 39) { return parity(x, y, z); }
     // else if (40 <= t && t <= 59) { return maj(x, y, z);    }
@@ -188,7 +187,7 @@ private:
   /**
    * @brief SHA-1で使用する32-bit定数(関数)Ktの定義
    */
-  constexpr std::uint32_t K(std::uint32_t t) const {
+  static constexpr std::uint32_t K(std::uint32_t t) {
     // if      (/*0<=t&&*/ t <= 19) { return 0x5a827999; }
     // else if (20 <= t && t <= 39) { return 0x6ed9eba1; }
     // else if (40 <= t && t <= 59) { return 0x8f1bbcdc; }

@@ -17,26 +17,25 @@
 #include <iostream>
 #endif
 
-class SHA256 {
+class sha256 {
 public:
   /**
    * @brief  SHA256の計算を行う
    * @param  const std::string& msg ハッシュ化対象のascii文字列
    * @return ハッシュ化されたbyte列(digest message)
    */
-  std::vector<std::uint8_t> hash(const std::string &msg) const {
+  static std::vector<std::uint8_t> hash(const std::string &msg) {
     std::vector<std::uint8_t> bytes(msg.size(), 0x00);
     std::copy(msg.cbegin(), msg.cend(), bytes.begin());
     return hash(bytes);
   }
 
-public:
   /**
    * @brief  SHA256の計算を行う
    * @param  const std::vector<std::uint8_t>& msg ハッシュ化対象のbyte列
    * @return ハッシュ化されたbyte列(digest message)
    */
-  std::vector<std::uint8_t> hash(const std::vector<std::uint8_t> &msg) const {
+  static std::vector<std::uint8_t> hash(const std::vector<std::uint8_t> &msg) {
     // ハッシュ値を用意
     std::vector<std::uint32_t> H{
         0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
@@ -157,8 +156,8 @@ private:
    *        01100001  01100010  01100011  1  00...00  00...011000
    *        a         b         c                          l = 24
    */
-  std::vector<std::uint8_t>
-  padding(const std::vector<std::uint8_t> &msg) const {
+  static std::vector<std::uint8_t>
+  padding(const std::vector<std::uint8_t> &msg) {
     // パディングすべき大きさを計算する
     const std::size_t msglen = msg.size();
     std::size_t padlen = 64 - (msglen % 64);
@@ -190,7 +189,7 @@ private:
    * @brief SHA256で使用する関数Σ{256}0(x)
    * @note  仕様書の式(4.4)に相当
    */
-  constexpr std::uint32_t big_sigma0(std::uint32_t x) const {
+  static constexpr std::uint32_t big_sigma0(std::uint32_t x) {
     return bit::rotr(x, 2) ^ bit::rotr(x, 13) ^ bit::rotr(x, 22);
   }
 
@@ -198,7 +197,7 @@ private:
    * @brief SHA256で使用する関数Σ{256}1(x)
    * @note  仕様書の式(4.5)に相当
    */
-  constexpr std::uint32_t big_sigma1(std::uint32_t x) const {
+  static constexpr std::uint32_t big_sigma1(std::uint32_t x) {
     return bit::rotr(x, 6) ^ bit::rotr(x, 11) ^ bit::rotr(x, 25);
   }
 
@@ -206,7 +205,7 @@ private:
    * @brief SHA256で使用する関数σ{256}0(x)
    * @note  仕様書の式(4.6)に相当
    */
-  constexpr std::uint32_t small_sigma0(std::uint32_t x) const {
+  static constexpr std::uint32_t small_sigma0(std::uint32_t x) {
     return bit::rotr(x, 7) ^ bit::rotr(x, 18) ^ (x >> 3);
   }
 
@@ -214,7 +213,7 @@ private:
    * @brief SHA256で使用する関数σ{256}1(x)
    * @note  仕様書の式(4.7)に相当
    */
-  constexpr std::uint32_t small_sigma1(std::uint32_t x) const {
+  static constexpr std::uint32_t small_sigma1(std::uint32_t x) {
     return bit::rotr(x, 17) ^ bit::rotr(x, 19) ^ (x >> 10);
   }
 
