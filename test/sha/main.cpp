@@ -3,6 +3,7 @@
 #include "matcher.hpp"
 #include "secure/hash/sha1.hpp"
 #include "secure/hash/sha256.hpp"
+#include "secure/hash/sha384.hpp"
 #include "secure/hash/sha512.hpp"
 
 TEST_CASE("SHA1-Example") {
@@ -66,5 +67,29 @@ TEST_CASE("SHA512-Example") {
                expect("e718483d0ce76964 4e2e42c7bc15b463 8e1f98b13b204428 "
                       "5632a803afa973eb de0ff244877ea60a 4cb0432ce577c31b "
                       "eb009c5c2c49aa2e 4eadb217ad8cc09b"));
+  }
+}
+
+TEST_CASE("SHA384-Example") {
+  SECTION("One-Block Message") {
+    const auto bytes = SHA384().hash("abc");
+    CHECK_THAT(bytes,
+               expect("cb00753f45a35e8b b5a03d699ac65007 272c32ab0eded163 "
+                      "1a8b605a43ff5bed 8086072ba1e7cc23 58baeca134c825a7"));
+  }
+  SECTION("Multi-Block Message") {
+    const auto bytes = SHA384().hash(
+        "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhi"
+        "jklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu");
+    CHECK_THAT(bytes,
+               expect("09330c33f71147e8 3d192fc782cd1b47 53111b173b3b05d2 "
+                      "2fa08086e3b0f712 fcc7c71a557e2db9 66c3e9fa91746039"));
+  }
+  SECTION("Long Message") {
+    const std::vector<std::uint8_t> msg(1000000, 0x61);
+    const auto bytes = SHA384().hash(msg);
+    CHECK_THAT(bytes,
+               expect("9d0e1809716474cb 086e834e310a4a1c ed149e9c00f24852 "
+                      "7972cec5704c2a5b 07b8b3dc38ecc4eb ae97ddd87f3d8985"));
   }
 }

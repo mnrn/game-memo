@@ -131,7 +131,6 @@ public:
     // 最終的なハッシュ値を返す
     std::vector<std::uint8_t> M(32); // 8 * 32 = 256-bits
     for (std::size_t i = 0; i < 8; i++) {
-
       const std::size_t base = i * 4;
       M[base + 0] = static_cast<std::uint8_t>(H[i] >> 24);
       M[base + 1] = static_cast<std::uint8_t>(H[i] >> 16);
