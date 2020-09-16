@@ -21,7 +21,7 @@ cmake --build /path/to/build --parallel 10
   - [fmt]
   - [catch2]
 
-[boost] の依存関係の解決には必ず [boost-bcp] を用いて必要なものだけ external/boost に置いてください。
+[boost] の依存関係の解決には必ず [boost-bcp] を用いて必要なものだけ third-party/boost に置いてください。
 
 ## Directory tree
 
@@ -59,7 +59,7 @@ cmake --build /path/to/build --parallel 10
 │  ├── baz.hpp
 │  ├── qux.hpp
 │  └── ...
-├── external
+├── third-party
 │  ├── hoge
 │  ├── fuga
 │  └── ...
