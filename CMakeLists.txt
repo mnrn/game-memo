@@ -100,5 +100,6 @@ buildAll()
 
 set(TEST_TARGETS
     bit
+    sha
 )
 testAll()
