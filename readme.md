@@ -30,6 +30,7 @@ cmake --build /path/to/build --parallel 10
 ├── readme.md
 ├── .clang-format.yml
 ├── .gitignore
+├── LICENSE
 ├── CMakeList.txt
 ├── projects
 │  ├── project1
