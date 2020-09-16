@@ -5,20 +5,23 @@
 
 ## Build
 
+例えば、デバッグビルドは以下のように行います。
+
 ```shell
 cmake --no-warn-unused-cli -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_BUILD_TYPE:STRING=Debug -H/path/to/ -B/path/to/build -G "Unix Makefiles"
-cmake --build /path/to/build
+cmake --build /path/to/build --parallel 10
 ```
 
 今の所、MS には対応していませんが、そのうち対応させようかと考えています。
 
 ## Dependency
 
-- header & lib
+- header-only
   - [boost]
-- header only
   - [fmt]
   - [catch2]
+
+[boost] の依存関係の解決には必ず [boost-bcp] を用いて必要なものだけ external/boost に置いてください。
 
 ## Directory tree
 
@@ -76,3 +79,4 @@ cmake --build /path/to/build
 [boost]:<https://www.boost.org/>
 [catch2]:<https://github.com/catchorg/Catch2>
 [fmt]:<https://github.com/fmtlib/fmt>
+[boost-bcp]:<https://www.boost.org/doc/libs/tools/bcp/doc/html/index.html>

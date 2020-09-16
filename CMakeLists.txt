@@ -16,8 +16,7 @@ include_directories(include)
 include_directories(src)
 
 
-# Select compilers
-set(CMAKE_C_COMPILER /usr/local/opt/llvm/bin/clang CACHE PATH "" FORCE) 
+# Select compiler
 set(CMAKE_CXX_COMPILER /usr/local/opt/llvm/bin/clang++ CACHE PATH "" FORCE) 
 
 # Compile mode
@@ -28,14 +27,6 @@ set(CMAKE_CXX_FLAGS_MINSIZEREL,     "${CMAKE_CXX_FLAGS_MINSIZEREL}      -DNDEBUG
 
 # Resolve dependency
 find_package(Threads REQUIRED)
-set(Boost_USE_STATIC_LIBS ON)
-find_package(Boost COMPONENTS system filesystem thread REQUIRED)
-if (NOT Boost_FOUND)
-    message(FATAL_ERROR "Could not find boost!")
-else()
-    include_directories(${Boost_INCLUDE_DIRS})
-endif()
-
 
 # Set preprocessor defines
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOMINMAX -D_USE_MATH_DEFINES")
@@ -71,7 +62,6 @@ function(build DIR_NAME TARGET_NAME)
     )
     target_link_libraries(${TARGET_NAME} 
         ${CMAKE_THREAD_LIBS_INIT}
-        ${Boost_LIBRARIES}
     )
 endfunction(build)
 
