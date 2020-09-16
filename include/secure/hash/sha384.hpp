@@ -1,9 +1,9 @@
 /**
- * @brief SHA-512の実装
+ * @brief SHA-384の実装
  */
 
-#ifndef SHA512_HPP
-#define SHA512_HPP
+#ifndef SHA384_HPP
+#define SHA384_HPP
 
 #include "bit/bit.hpp"
 #include <array>
@@ -17,10 +17,10 @@
 #include <iostream>
 #endif
 
-class SHA512 {
+class SHA384 {
 public:
   /**
-   * @brief  SHA-512の計算を行う
+   * @brief  SHA-384の計算を行う
    * @param  const std::string& msg ハッシュ化対象のascii文字列
    * @return ハッシュ化されたbyte列(digest message)
    */
@@ -32,16 +32,16 @@ public:
 
 public:
   /**
-   * @brief  SHA-512の計算を行う
+   * @brief  SHA-384の計算を行う
    * @param  const std::vector<std::uint8_t>& msg ハッシュ化対象のbyte列
    * @return ハッシュ化されたbyte列(digest message)
    */
   std::vector<std::uint8_t> hash(const std::vector<std::uint8_t> &msg) const {
     // ハッシュ値を用意
     std::vector<std::uint64_t> H{
-        0x6a09e667f3bcc908, 0xbb67ae8584caa73b, 0x3c6ef372fe94f82b,
-        0xa54ff53a5f1d36f1, 0x510e527fade682d1, 0x9b05688c2b3e6c1f,
-        0x1f83d9abfb41bd6b, 0x5be0cd19137e2179,
+        0xcbbb9d5dc1059ed8, 0x629a292a367cd507, 0x9159015a3070dd17,
+        0x152fecd8f70e5939, 0x67332667ffc00b31, 0x8eb44a8768581511,
+        0xdb0c2e0d64f98fa7, 0x47b5481dbefa4fa4,
     };
 
     // プリプロセス: メッセージにパディングを施す
@@ -136,8 +136,9 @@ public:
     }
 
     // 最終的なハッシュ値を返す
-    std::vector<std::uint8_t> M(64); // 8 * 64 = 512-bits
-    for (std::size_t i = 0; i < 8; i++) {
+    std::vector<std::uint8_t> M(48); // 8 * 48 = 384-bits
+    for (std::size_t i = 0; i < 6; i++) {
+
       const std::size_t base = i * 8;
       M[base] = static_cast<std::uint8_t>(H[i] >> 56);
       M[base + 1] = static_cast<std::uint8_t>(H[i] >> 48);
