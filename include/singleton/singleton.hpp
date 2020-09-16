@@ -25,7 +25,6 @@
 
 /**
  * @brief シングルトンの基底クラス
- * @date  2016/08/14
  */
 template <class T> class singleton : private boost::noncopyable {
 public:

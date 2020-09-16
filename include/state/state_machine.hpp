@@ -21,6 +21,10 @@
 // クラスの定義
 //********************************************************************************
 
+/**
+ * @brief shared_ptr に this ポインタを渡すときは、enable_shared_from_this
+ * を継承してください。
+ */
 template <typename T> struct state_machine : private boost::noncopyable {
 public:
   state_machine(std::shared_ptr<T> owner, const state<T> &init)
