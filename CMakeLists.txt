@@ -84,7 +84,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/")
 
 # TODO: hello -> directory that you want build.
 set(TARGETS
-    hello
 )
 buildAll()
 
