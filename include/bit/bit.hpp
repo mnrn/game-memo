@@ -55,11 +55,9 @@ static constexpr inline std::int32_t nlz(std::uint32_t v) {
  * @param uint32_t n  Shift count
  */
 template <typename Integer> constexpr Integer rotl(Integer x, std::uint32_t n) {
-  if constexpr (std::is_unsigned_v<Integer>) {
-    return (x << n) | (x >> ((sizeof(Integer) * CHAR_BIT - 1) & (-n)));
-  } else if constexpr (std::is_signed_v<Integer>) {
-    return rotl(static_cast<typename std::make_unsigned_t<Integer>>(x), n);
-  }
+  static_assert(std::is_unsigned_v<Integer>,
+                "only makes sence for unsigned types");
+  return (x << n) | (x >> ((sizeof(Integer) * CHAR_BIT - 1) & (-n)));
 }
 
 /**
@@ -69,11 +67,9 @@ template <typename Integer> constexpr Integer rotl(Integer x, std::uint32_t n) {
  * @param uint32_t n  Shift count
  */
 template <typename Integer> constexpr Integer rotr(Integer x, std::uint32_t n) {
-  if constexpr (std::is_unsigned_v<Integer>) {
-    return (x >> n) | (x << ((sizeof(Integer) * CHAR_BIT - 1) & (-n)));
-  } else if constexpr (std::is_signed_v<Integer>) {
-    return rotr(static_cast<typename std::make_unsigned_t<Integer>>(x), n);
-  }
+  static_assert(std::is_unsigned_v<Integer>,
+                "only makes sence for unsigned types");
+  return (x >> n) | (x << ((sizeof(Integer) * CHAR_BIT - 1) & (-n)));
 }
 
 /**
