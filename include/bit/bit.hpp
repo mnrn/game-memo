@@ -39,7 +39,7 @@ namespace bit {
 static constexpr inline std::int32_t nlz(std::uint32_t v) {
   static_assert(
       std::numeric_limits<double>::is_iec559,
-      "only support IEC 559 (IEEE 754) double precision floationg point.");
+      "only support IEC 559 (IEEE 754) double precision floating point.");
   union anonymous {
     std::uint64_t asu64;
     double asf64;
