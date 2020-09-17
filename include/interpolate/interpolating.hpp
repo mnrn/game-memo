@@ -40,7 +40,7 @@ namespace interpolating {
  */
 template <typename T1, typename T2, typename Float>
 constexpr auto interpolate(const T1 &b, const T2 &e, Float t) {
-  static_assert(std::is_floating_point<Float>::value,
+  static_assert(std::is_floating_point_v<Float>,
                 "only makes sence for floating point types.");
   return (1.0 - t) * b + t * e;
 }
