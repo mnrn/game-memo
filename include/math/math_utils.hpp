@@ -18,9 +18,10 @@ template <typename Float> constexpr inline Float wrap_pi(Float x) {
   static_assert(std::is_floating_point_v<Float>,
                 "only makes sence for floating point types.");
   namespace bmc = boost::math::constants;
-  constexpr Float y = x + bmc::pi;
-  constexpr Float z = y - std::floor(y * bmc::half_pi) * bmc::two_pi;
-  constexpr Float w = z - bmc::pi;
+  constexpr Float y = x + bmc::pi<Float>();
+  constexpr Float z =
+      y - std::floor(y * bmc::half_pi<Float>()) * bmc::two_pi<Float>();
+  constexpr Float w = z - bmc::pi<Float>();
   return w;
 }
 
