@@ -11,7 +11,7 @@ project(${PROJECT_NAME})
 # Include dirctories
 set(PROJECTS_DIR_NAME projects)
 set(TESTS_DIR_NAME test)
-include_directories(third-party)
+include_directories(SYSTEM third-party)
 include_directories(include)
 include_directories(src)
 
@@ -91,5 +91,6 @@ set(TEST_TARGETS
     bit
     sha
     tolerance_compare
+    easing
 )
 testAll()

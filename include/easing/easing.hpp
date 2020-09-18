@@ -12,6 +12,14 @@
 
 namespace easing {
 
+namespace impl {
+template <typename T, typename U, typename = std::void_t<>>
+class has_in : public std::false_type {};
+template <typename T, typename U>
+class has_in<T, U, std::void_t<decltype(T::in(std::declval<U>()))>>
+    : public std::true_type {};
+} // namespace impl
+
 template <typename Float = float> constexpr Float linear(Float x) {
   static_assert(std::is_floating_point_v<Float>,
                 "only makes sence for floating point types.");
@@ -68,8 +76,9 @@ template <typename Float = float> struct expo {
   static_assert(std::is_floating_point_v<Float>,
                 "only makes sence for floating point types.");
   static constexpr Float in(Float x) {
-    return tolerance_compare::float_eq(x, 0.0) ? 0.0
-                                               : std::pow(2.0, 10.0 * x - 10.0);
+    return tolerance_compare::float_eq(x, Float(0.0))
+               ? 0.0
+               : std::pow(2.0, 10.0 * x - 10.0);
   }
 };
 
@@ -96,9 +105,9 @@ template <typename Float = float> struct elastic {
                 "only makes sence for floating point types.");
   static constexpr Float in(Float x) {
     constexpr Float c4 = boost::math::constants::two_pi<Float>() / 3.0;
-    return tolerance_compare::float_eq(x, 0.0)
+    return tolerance_compare::float_eq(x, Float(0.0))
                ? 0.0
-               : tolerance_compare::float_eq(x, 1.0)
+               : tolerance_compare::float_eq(x, Float(1.0))
                      ? 1.0
                      : -std::pow(2.0, 10.0 * x - 10.0) *
                            std::sin((x * 10 - 10.75) * c4);
@@ -129,7 +138,7 @@ template <typename ease_type, typename param_type = float> struct ease {
                 "only makes sence for floating point types.");
 
   static constexpr param_type in(param_type x) {
-    if constexpr (impl::has_in<ease_type>::value) {
+    if constexpr (impl::has_in<ease_type, param_type>::value) {
       return ease_type::in(x);
     } else {
       return 1.0 - out(1.0 - x);
@@ -137,28 +146,16 @@ template <typename ease_type, typename param_type = float> struct ease {
   }
 
   static constexpr param_type out(param_type x) {
-    if constexpr (impl::has_in<ease_type>::value) {
+    if constexpr (impl::has_in<ease_type, param_type>::value) {
       return 1.0 - in(1.0 - x);
     } else {
       return ease_type::out(x);
     }
   }
-
   static constexpr param_type inout(param_type x) {
     return (x < 0.5) ? in(2.0 * x) * 0.5 : 0.5 + out(2.0 * x - 1.0) * 0.5;
   }
 };
-
-namespace impl {
-
-struct has_in_impl {
-  template <typename T> static std::true_type check(typename T::in *);
-  template <typename T> static std::false_type check(...);
-};
-template <typename T>
-class has_in : public decltype(has_in_impl::check<T>(nullptr)) {};
-
-} // namespace impl
 
 } // namespace easing
 
