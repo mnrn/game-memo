@@ -20,14 +20,6 @@ class has_in<T, U, std::void_t<decltype(T::in(std::declval<U>()))>>
     : public std::true_type {};
 } // namespace impl
 
-template <typename Float = float>
-constexpr Float exp_impulse(Float k, Float x) {
-  static_assert(std::is_floating_point_v<Float>,
-                "only makes sence for floating point types.");
-  constexpr Float h = k * x;
-  return h * std::exp(1.0 - h);
-}
-
 template <typename Float = float> struct sine {
   static_assert(std::is_floating_point_v<Float>,
                 "only makes sence for floating point types.");
