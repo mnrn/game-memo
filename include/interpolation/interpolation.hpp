@@ -49,7 +49,7 @@ constexpr decltype(auto) lerp(const T1 &a, const T2 &b, Float t) {
 template <typename T1, typename T2, typename T3>
 constexpr decltype(auto) smoothstep(const T1 &edge0, const T2 &edge1,
                                     const T3 &x) {
-  constexpr decltype(auto) t =
+  decltype(auto) t =
       std::clamp((x - edge0) / (edge1 - edge0),
                  static_cast<decltype((x - edge0) / (edge1 - edge0))>(0.0),
                  static_cast<decltype((x - edge0) / (edge1 - edge0))>(1.0));

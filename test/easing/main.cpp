@@ -36,7 +36,7 @@ plot(const std::string &plot_name, const std::string &points_data_path,
   std::vector<float> xs(101), ys(101);
   for (int i = 0; i <= 100; i++) {
     xs[i] = i * 0.01f;
-    ys[i] = interpolation::smoothstep(0.0f, 1.0f, easing(xs[i]));
+    ys[i] = interpolation::lerp(0.0f, 1.0f, easing(xs[i]));
   }
   std::ofstream points_file(points_data_path);
   for (int i = 0; i <= 100; i++) {
