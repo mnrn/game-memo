@@ -20,12 +20,6 @@ class has_in<T, U, std::void_t<decltype(T::in(std::declval<U>()))>>
     : public std::true_type {};
 } // namespace impl
 
-template <typename Float = float> constexpr Float linear(Float x) {
-  static_assert(std::is_floating_point_v<Float>,
-                "only makes sence for floating point types.");
-  return x;
-}
-
 template <typename Float = float> constexpr Float smoothstep(Float x) {
   static_assert(std::is_floating_point_v<Float>,
                 "only makes sence for floating point types.");
@@ -152,10 +146,29 @@ template <typename ease_type, typename param_type = float> struct ease {
       return ease_type::out(x);
     }
   }
+
   static constexpr param_type inout(param_type x) {
     return (x < 0.5) ? in(2.0 * x) * 0.5 : 0.5 + out(2.0 * x - 1.0) * 0.5;
   }
 };
+
+template <typename Float = float> constexpr Float linear(Float x) {
+  static_assert(std::is_floating_point_v<Float>,
+                "only makes sence for floating point types.");
+  return x;
+}
+
+template <typename Float = float> constexpr Float ease_in(Float x) {
+  return ease<quad<Float>, Float>::in(x);
+}
+
+template <typename Float = float> constexpr Float ease_out(Float x) {
+  return ease<quad<Float>, Float>::out(x);
+}
+
+template <typename Float = float> constexpr Float ease_inout(Float x) {
+  return ease<quad<Float>, Float>::inout(x);
+}
 
 } // namespace easing
 

@@ -63,6 +63,12 @@ static void plot(const std::string &type_name, bool is_dynamic = false) {
 int main() {
   plot("linear plot", "data/linear.dat", "data/linear.png",
        easing::linear<float>);
+  plot("ease in plot", "data/ease_in.dat", "data/ease_in.png",
+       easing::ease_in<float>);
+  plot("ease out plot", "data/ease_out.dat", "data/ease_out.png",
+       easing::ease_out<float>);
+  plot("ease inout plot", "data/ease_inout.dat", "data/ease_inout.png",
+       easing::ease_inout<float>);
   plot("smoothstep plot", "data/smoothstep.dat", "data/smoothstep.png",
        easing::smoothstep<float>);
 
