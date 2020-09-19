@@ -69,8 +69,6 @@ int main() {
        easing::ease_out<float>);
   plot("ease inout plot", "data/ease_inout.dat", "data/ease_inout.png",
        easing::ease_inout<float>);
-  plot("smoothstep plot", "data/smoothstep.dat", "data/smoothstep.png",
-       easing::smoothstep<float>);
 
   plot<easing::ease<easing::sine<float>, float>>("sine");
   plot<easing::ease<easing::quad<float>, float>>("quad");

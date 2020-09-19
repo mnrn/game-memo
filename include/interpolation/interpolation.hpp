@@ -16,6 +16,7 @@
 // ********************************************************************************
 
 #include <type_traits>
+#include <utility>
 
 // ********************************************************************************
 // Namespace
@@ -43,6 +44,14 @@ constexpr decltype(auto) lerp(const T1 &a, const T2 &b, Float t) {
   static_assert(std::is_floating_point_v<Float>,
                 "only makes sence for floating point types.");
   return (static_cast<Float>(1.0) - t) * a + t * b;
+}
+
+template <typename T1, typename T2, typename T3>
+constexpr decltype(auto) smoothstep(const T1 &edge0, const T2 &edge1,
+                                    const T3 &x) {
+  constexpr decltype(auto) t =
+      std::clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
+  return t * t * (3.0 - 2.0 * t);
 }
 
 } // namespace interpolation
