@@ -104,18 +104,40 @@ template <class Key, class T, class Compare = std::less<Key>> struct avl_tree {
     root_ = erase(root_, k);
     size_--;
   }
+
   /**
    * @brief AVL木Tにキーkの挿入を行う
    * @note  実行時間はΟ(lgn)
    * @param const Key& k キーk
    * @param const T& v   付属データv
    */
-  node *update(const Key &k, const T &v) {
-    node *x = find(root_, k);
-    if (x != nullptr) {
+  std::optional<T> safe_insert(const Key &k, const T &v) {
+    if ((node *x = find(root_, k)) != nullptr) {
+      T u = x->v;
       x->v = v;
+      return std::make_optional(u);
     }
-    return x;
+    if ((node *z = create_node(k, v)) != nullptr) {
+      root_ = insert(root_, z);
+      size_++;
+    }
+    return std::nullopt;
+  }
+
+  /**
+   * @brief AVL木Tからキーkを持つ節点の削除を行う
+   * @note  実行時間はΟ(lgn)
+   * @param const Key& k キーk
+   */
+  std::optional<T> safe_erase(const Key &k) {
+    if ((node *x = find(root_, k)) != nullptr) {
+      T u = x->v;
+      root_ = erase(root_, k);
+      size_--;
+      return u;
+    } else {
+      return std::nullopt;
+    }
   }
 
   /**
@@ -173,9 +195,11 @@ private:
     if (x == nullptr) {
       return z;
     } // xがNILを指すとき、再帰は底をつく
-    cmp_(z->key, x->key)
-        ? x->left = insert(x->left, z)
-        : x->right = insert(x->right, z); // xの適切な子に再帰し、
+    if (cmp_(z->key, x->key)) { // xの適切な子に再帰し、
+      x->left = insert(x->left, z);
+    } else {
+      x->right = insert(x->right, z);
+    }
     return balance(x); // xを根とする部分木を高さ平衡にする
   }
 
