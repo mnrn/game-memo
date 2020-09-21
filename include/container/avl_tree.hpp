@@ -90,8 +90,7 @@ template <class Key, class T, class Compare = std::less<Key>> struct avl_tree {
   void insert(const Key &k, const T &v) {
     node *z = create_node(k, v);
     assert(z != nullptr);
-    root_ = insert(root_, z);
-    size_++;
+    root_ = insert(root_, k, v);
   }
 
   /**
@@ -102,7 +101,6 @@ template <class Key, class T, class Compare = std::less<Key>> struct avl_tree {
   void erase(const Key &k) {
     assert(root_ != nullptr);
     root_ = erase(root_, k);
-    size_--;
   }
 
   /**
@@ -156,14 +154,16 @@ private:
    * @param node*x       節点x
    * @param node*z       キーkを持つ節点z
    */
-  node *insert(node *x, node *z) const {
+  node *insert(node *x, const Key &k, const T &v) {
     if (x == nullptr) {
-      return z;
-    } // xがNILを指すとき、再帰は底をつく
-    if (cmp_(z->key, x->key)) { // xの適切な子に再帰し、
-      x->left = insert(x->left, z);
+      return create_node(x, k, v);
+    }                      // xがNILを指すとき、再帰は底をつく
+    if (cmp_(k, x->key)) { // xの適切な子に再帰し、
+      x->left = insert(x->left, k, v);
+    } else if (cmp_(x->key, k)) {
+      x->right = insert(x->right, k, v);
     } else {
-      x->right = insert(x->right, z);
+      x->v = v;
     }
     return balance(x); // xを根とする部分木を高さ平衡にする
   }
@@ -237,7 +237,7 @@ private:
    * @param  sides_t i  添字i(0のとき左、1のとき右)
    * @param  sides_t j  添字j(0のとき左、1のとき右)
    */
-  node *rotate(node *x, sides_t i, sides_t j) {
+  static node *rotate(node *x, sides_t i, sides_t j) {
     node *y = x->c[j];  // yをxのjの子とする
     x->c[j] = y->c[i];  // yのi部分木をxのj部分木にする
     y->c[i] = x;        // xをyのiの子にする
@@ -286,6 +286,7 @@ private:
     node *x = free_;
     free_ = x->next;
     construct(x, std::forward<Args>(args)...);
+    size_++;
     return x;
   }
 
@@ -294,6 +295,7 @@ private:
     destroy(x);
     x->next = free_;
     free_ = x;
+    size_--;
   }
 
   /**< @brief 節点n個分の記憶領域を確保する */
