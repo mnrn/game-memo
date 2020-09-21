@@ -5,9 +5,9 @@
 #ifndef SKEW_HEAP_HPP
 #define SKEW_HEAP_HPP
 
-#include "container.hpp"
 #include <algorithm>
 #include <cassert>
+#include <experimental/memory_resource>
 #include <optional>
 
 namespace container {
@@ -89,26 +89,13 @@ private:
 
   /**< @brief 節点xの記憶領域の確保を行う */
   template <class... Args> node *create_node(Args &&... args) {
-    node *x = free_;
-    free_ = x->next;
-    construct(x, std::forward<Args>(args)...);
+    node *x = pool_ + size_;
+    alloc.construct(x, std::forward<Args>(args)...);
     return x;
   }
 
   /**< @brief 節点xの記憶領域の解放を行う */
-  void destroy_node(node *x) noexcept {
-    destroy(x->key);
-    x->next = free_;
-    free_ = x;
-  }
-
-  /**< @brief 節点n個分の記憶領域を確保する */
-  node *allocate_nodes(std::size_t n) {
-    return static_cast<node *>(::operator new(sizeof(node) * n, std::nothrow));
-  }
-
-  /**< @brief 節点xの記憶領域を解放する */
-  void free_node(node *x) noexcept { ::operator delete(x); }
+  void destroy_node(node *x) noexcept { alloc.destroy(x); }
 
   /**< @brief 節点xを根とした部分木を再帰的に解放する */
   void postorder_destroy_nodes(node *x) noexcept {
@@ -117,42 +104,27 @@ private:
     }
     postorder_destroy_nodes(x->left);
     postorder_destroy_nodes(x->right);
-    destroy_node(x);
+    alloc.destroy(x->key);
   }
 
   /**< @brief メモリプールの解放 */
   void free_pool() noexcept {
     postorder_destroy_nodes(root_);
-    free_node(pool_);
-    root_ = pool_ = free_ = nullptr;
+    alloc.deallocate(pool_, size_);
+    root_ = nullptr;
     size_ = cap_ = 0;
   }
 
   /**< @brief メモリプールの確保 */
-  void allocate_pool(std::size_t n) {
-    if (n == 0) {
-      return;
-    }
-    pool_ = allocate_nodes(n);
-    if (pool_ == nullptr) {
-      return;
-    }
-    for (std::size_t i = 0; i < n - 1; i++) {
-      pool_[i].next = &pool_[i + 1];
-    }
-    pool_[n - 1].next = nullptr;
-    free_ = pool_;
-    cap_ = n;
-  }
+  void allocate_pool(std::size_t n) { pool_ = alloc.allocate(n); }
 
 private:
-  node *root_;  /**< 木の根   */
-  Compare cmp_; /**< 比較述語 */
-
-  std::size_t cap_;  /**< ねじれヒープのバッファサイズ */
-  std::size_t size_; /**< ねじれヒープのサイズ */
-  node *pool_;       /**< ねじれヒープの節点用メモリプール */
-  node *free_;       /**< 空き節点へのポインタ */
+  node *root_ = nullptr; /**< 木の根   */
+  Compare cmp_;          /**< 比較述語 */
+  std::size_t cap_ = 0;  /**< ねじれヒープのバッファサイズ */
+  std::size_t size_ = 0; /**< ねじれヒープのサイズ */
+  node *pool_ = nullptr;
+  std::experimental::pmr::popymorphic_allocator<node> alloc{};
 };
 
 } // namespace container
