@@ -94,5 +94,6 @@ set(TEST_TARGETS
     easing
     stack
     queue
+    skew_heap
 )
 testAll()

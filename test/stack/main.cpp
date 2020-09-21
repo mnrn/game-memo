@@ -21,4 +21,5 @@ TEST_CASE("Stack Push Pop Test 2") {
   REQUIRE(s.pop() == std::make_optional(3));
   REQUIRE(s.pop() == std::make_optional(2));
   REQUIRE(s.pop() == std::make_optional(1));
+  REQUIRE(s.pop() == std::nullopt);
 }

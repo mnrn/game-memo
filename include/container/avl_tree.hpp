@@ -77,7 +77,7 @@ template <class Key, class T, class Compare = std::less<Key>> struct avl_tree {
    * @brief  中間順木巡回を行う
    * @note   n個の節点を持つ2分探索木の巡回はΘ(n)かかる
    * @tparam class F const Key&を引数に取る関数オブジェクトの型
-   * @param F fn     const Key&を引数に取る関数オブジェクト
+   * @param F fn     const T&を引数に取る関数オブジェクト
    */
   template <class F> void inorder(F fn) { inorder(root_, fn); }
 
@@ -104,6 +104,19 @@ template <class Key, class T, class Compare = std::less<Key>> struct avl_tree {
     root_ = erase(root_, k);
     size_--;
   }
+  /**
+   * @brief AVL木Tにキーkの挿入を行う
+   * @note  実行時間はΟ(lgn)
+   * @param const Key& k キーk
+   * @param const T& v   付属データv
+   */
+  node *update(const Key &k, const T &v) {
+    node *x = find(root_, k);
+    if (x != nullptr) {
+      x->v = v;
+    }
+    return x;
+  }
 
   /**
    * @brief  AVL木からキーkに対応する付属データを返す
@@ -111,7 +124,10 @@ template <class Key, class T, class Compare = std::less<Key>> struct avl_tree {
    * @param  const Key& k キーk
    * @return キーkに対応する付属データ
    */
-  std::optional<T> find(const Key &k) { return find(root_, k); }
+  std::optional<T> find(const Key &k) const {
+    const node *x = find(root_, k);
+    return x == nullptr ? std::nullopt : std::make_optional(x->v);
+  }
 
 private:
   /**
@@ -126,7 +142,7 @@ private:
       return;
     } // xがNILを指すとき、再帰は底をつく
     inorder(x->left, fn);
-    fn(x->key);
+    fn(x->key, x->v);
     inorder(x->right,
             fn); // xの左右の子を根とする部分木に対して中間順木巡回を行う
   }
@@ -137,7 +153,7 @@ private:
    * @param  const Key& k キーk
    * @return キーkに対応する付属データへのポインタ
    */
-  std::optional<T> find(node *x, const Key &k) {
+  node *find(node *x, const Key &k) const {
     while (x != nullptr && neq(x->key, k)) {
       if (cmp_(x->key, k)) {
         x = x->left;
@@ -145,7 +161,7 @@ private:
         x = x->right;
       }
     }
-    return x == nullptr ? std::nullopt : std::make_optional(x->v);
+    return x;
   }
 
   /**
@@ -153,7 +169,7 @@ private:
    * @param node*x       節点x
    * @param node*z       キーkを持つ節点z
    */
-  node *insert(node *x, node *z) {
+  node *insert(node *x, node *z) const {
     if (x == nullptr) {
       return z;
     } // xがNILを指すとき、再帰は底をつく
@@ -202,7 +218,7 @@ private:
    * @param  node*x 節点x
    * @return 高さ平衡な部分木の根
    */
-  node *balance(node *x) {
+  static node *balance(node *x) {
     x->h = reheight(x); // xの高さを更新する
     if (bias(x) > 1) {  // 左に2つ分偏っている場合、left-left
                         // caseおよびleft-right caseが考えられる
@@ -244,13 +260,13 @@ private:
    * @brief 節点xを根とする部分木の中から最も左にある子を取得する
    * @param node*x 節点x
    */
-  node *leftmost(node *x) { return x->left ? leftmost(x->left) : x; }
+  static node *leftmost(node *x) { return x->left ? leftmost(x->left) : x; }
 
   /**
    * @brief xを根とする部分木の最も左の子を削除する補助関数
    * @param node*x 節点x
    */
-  node *erase__(node *x) {
+  static node *erase__(node *x) {
     if (x->left == nullptr) {
       return x->right;
     }
@@ -260,15 +276,15 @@ private:
 
 private:
   /**< @brief 節点xの高さを取得する  */
-  constexpr height_t height(node *x) noexcept { return x ? x->h : 0; }
+  static constexpr height_t height(node *x) noexcept { return x ? x->h : 0; }
 
   /**< @brief 節点xの更新される高さを返す */
-  constexpr height_t reheight(node *x) noexcept {
+  static constexpr height_t reheight(node *x) noexcept {
     return std::max(height(x->left), height(x->right)) + 1;
   }
 
   /**< @brief 節点xの左右の子の高さの差(x.left - x.right)を返す */
-  constexpr height_t bias(node *x) noexcept {
+  static constexpr height_t bias(node *x) noexcept {
     return height(x->left) - height(x->right);
   }
 
@@ -280,7 +296,8 @@ private:
     }
     node *x = free_;
     free_ = x->next;
-    return construct(x, k, v);
+    construct(x, std::forward<Args>(args)...);
+    return x;
   }
 
   /**< @brief 節点xの記憶領域の解放を行う */
@@ -335,7 +352,9 @@ private:
 
 private:
   /**< ＠brief キーlとキーrの非同値判定を行う */
-  bool neq(const Key &l, const Key &r) { return (cmp_(l, r) || cmp_(r, l)); }
+  bool neq(const Key &l, const Key &r) const {
+    return (cmp_(l, r) || cmp_(r, l));
+  }
 };
 
 } // namespace container

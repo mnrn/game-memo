@@ -29,8 +29,6 @@ public:
     constexpr explicit node(Args &&... args) noexcept
         : left(nullptr), right(nullptr), next(nullptr),
           key(std::forward<Args>(args)...) {}
-    constexpr explicit node(const Key &key) noexcept
-        : left(nullptr), right(nullptr), next(nullptr), key(key) {}
   };
 
   explicit skew_heap(std::size_t n = 32)
@@ -93,7 +91,8 @@ private:
   template <class... Args> node *create_node(Args &&... args) {
     node *x = free_;
     free_ = x->next;
-    return construct(x, std::forward<Args>(args)...);
+    construct(x, std::forward<Args>(args)...);
+    return x;
   }
 
   /**< @brief 節点xの記憶領域の解放を行う */

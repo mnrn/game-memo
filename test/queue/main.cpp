@@ -21,4 +21,5 @@ TEST_CASE("Queue Push Pop Test 2") {
   REQUIRE(q.pop() == std::make_optional(1));
   REQUIRE(q.pop() == std::make_optional(2));
   REQUIRE(q.pop() == std::make_optional(3));
+  REQUIRE(q.pop() == std::nullopt);
 }
