@@ -106,41 +106,6 @@ template <class Key, class T, class Compare = std::less<Key>> struct avl_tree {
   }
 
   /**
-   * @brief AVL木Tにキーkの挿入を行う
-   * @note  実行時間はΟ(lgn)
-   * @param const Key& k キーk
-   * @param const T& v   付属データv
-   */
-  std::optional<T> safe_insert(const Key &k, const T &v) {
-    if ((node *x = find(root_, k)) != nullptr) {
-      T u = x->v;
-      x->v = v;
-      return std::make_optional(u);
-    }
-    if ((node *z = create_node(k, v)) != nullptr) {
-      root_ = insert(root_, z);
-      size_++;
-    }
-    return std::nullopt;
-  }
-
-  /**
-   * @brief AVL木Tからキーkを持つ節点の削除を行う
-   * @note  実行時間はΟ(lgn)
-   * @param const Key& k キーk
-   */
-  std::optional<T> safe_erase(const Key &k) {
-    if ((node *x = find(root_, k)) != nullptr) {
-      T u = x->v;
-      root_ = erase(root_, k);
-      size_--;
-      return u;
-    } else {
-      return std::nullopt;
-    }
-  }
-
-  /**
    * @brief  AVL木からキーkに対応する付属データを返す
    * @note   実行時間はΟ(lgn)
    * @param  const Key& k キーk
