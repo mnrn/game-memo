@@ -2,16 +2,8 @@
  * @brief スタック
  */
 
-//****************************************
-// インクルードガード
-//****************************************
-
 #ifndef STACK_HPP
 #define STACK_HPP
-
-//****************************************
-// 必要なヘッダファイルのインクルード
-//****************************************
 
 #include "container.hpp"
 #include <algorithm>
@@ -20,9 +12,7 @@
 #include <optional>
 #include <type_traits>
 
-//****************************************
-// 構造体の定義
-//****************************************
+namespace container {
 
 /**
  * @brief  スタック
@@ -83,5 +73,7 @@ private:
     ::operator delete(S); /* 記憶領域の解放*/
   }
 };
+
+} // namespace container
 
 #endif // end of STACK_HPP

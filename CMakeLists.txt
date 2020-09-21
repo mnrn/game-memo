@@ -92,5 +92,7 @@ set(TEST_TARGETS
     sha
     tolerance_compare
     easing
+    stack
+    queue
 )
 testAll()

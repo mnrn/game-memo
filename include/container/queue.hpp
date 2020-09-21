@@ -2,16 +2,8 @@
  * @brief キュー
  */
 
-//****************************************
-// インクルードガード
-//****************************************
-
 #ifndef QUEUE_HPP
 #define QUEUE_HPP
-
-//****************************************
-// 必要なヘッダファイルのインクルード
-//****************************************
 
 #include "container.hpp"
 #include <algorithm>
@@ -20,9 +12,7 @@
 #include <optional>
 #include <type_traits>
 
-//****************************************
-// 構造体の定義
-//****************************************
+namespace container {
 
 /**
  * @brief キュー
@@ -87,5 +77,7 @@ private:
     ::operator delete(Q); /* 記憶領域の解放 */
   }
 };
+
+} // namespace container
 
 #endif // end of QUEUE_HPP

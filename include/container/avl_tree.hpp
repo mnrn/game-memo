@@ -12,25 +12,15 @@
  * @note  今回は属性pを省略してコードの簡略化を図ることにする
  */
 
-//****************************************
-// インクルードガード
-//****************************************
-
 #ifndef AVL_TREE_HPP
 #define AVL_TREE_HPP
-
-//****************************************
-// 必要なヘッダファイルのインクルード
-//****************************************
 
 #include "container.hpp"
 #include <algorithm>
 #include <optional>
 #include <utility>
 
-//****************************************
-// 構造体の定義
-//****************************************
+namespace container {
 
 /**
  * @brief  AVL木
@@ -347,5 +337,7 @@ private:
   /**< ＠brief キーlとキーrの非同値判定を行う */
   bool neq(const Key &l, const Key &r) { return (cmp_(l, r) || cmp_(r, l)); }
 };
+
+} // namespace container
 
 #endif // end of AVL_TREE_HPP
