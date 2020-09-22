@@ -43,7 +43,6 @@ public:
 
   /** @brief ねじれヒープHに要素xを挿入する @param const Key& key 要素xのキー */
   template <class... Args> void push(Args &&... args) {
-    BOOST_ASSERT_MSG(!full(), "Skew heap capcity over.");
     node *x = create_node(std::forward<Args>(args)...);
     root_ = merge(root_, x);
   }
@@ -91,6 +90,7 @@ private:
 
   /**< @brief 節点xの記憶領域の確保を行う */
   template <class... Args> node *create_node(Args &&... args) {
+    BOOST_ASSERT_MSG(!full(), "Skew heap capcity over.");
     node *x = pool_ + size_;
     alloc_.construct(x, std::forward<Args>(args)...);
     size_++;
