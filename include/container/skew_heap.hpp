@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <boost/assert.hpp>
+#include <boost/container/pmr/polymorphic_allocator.hpp>
 #include <cassert>
 #include <memory>
 #include <optional>
@@ -30,7 +31,8 @@ template <class Key> struct node {
  * @tparam Compare 比較述語の型
  */
 template <class Key,
-          class Allocator = std::allocator<skew_heap_impl::node<Key>>,
+          class Allocator = boost::container::pmr::polymorphic_allocator<
+              skew_heap_impl::node<Key>>,
           class Compare = std::less<Key>>
 struct skew_heap {
 public:
