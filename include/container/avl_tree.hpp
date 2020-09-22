@@ -50,8 +50,7 @@ template <class Key, class T, class Compare = std::less<Key>> struct avl_tree {
       const Key key;             /**< キー    */
       const char d[sizeof(Key)]; /**< ダミー  */
     };
-    T v;        /**< 付属データ */
-    node *next; /**< 単方向未使用リストL */
+    T v; /**< 付属データ */
 
     constexpr node() noexcept
         : left(nullptr), right(nullptr), h(1), d("\0"), next(nullptr) {}
