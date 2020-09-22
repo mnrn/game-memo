@@ -46,7 +46,6 @@ public:
     BOOST_ASSERT_MSG(!full(), "Skew heap capcity over.");
     node *x = create_node(std::forward<Args>(args)...);
     root_ = merge(root_, x);
-    size_++;
   }
 
   /**< @brief ねじれヒープHから先頭のキーを取り出し、要素を削除する */
@@ -58,7 +57,6 @@ public:
     node *x = root_;
     root_ = merge(x->left, x->right);
     destroy_node(x);
-    size_--;
     return std::make_optional(k);
   }
 
@@ -94,12 +92,16 @@ private:
   /**< @brief 節点xの記憶領域の確保を行う */
   template <class... Args> node *create_node(Args &&... args) {
     node *x = pool_ + size_;
-    alloc.construct(x, std::forward<Args>(args)...);
+    alloc_.construct(x, std::forward<Args>(args)...);
+    size_++;
     return x;
   }
 
   /**< @brief 節点xの記憶領域の解放を行う */
-  void destroy_node(node *x) noexcept { alloc.destroy(x); }
+  void destroy_node(node *x) noexcept {
+    alloc_.destroy(x);
+    size_--;
+  }
 
   /**< @brief 節点xを根とした部分木を再帰的に解放する */
   void postorder_destroy_nodes(node *x) noexcept {
@@ -114,14 +116,14 @@ private:
   /**< @brief メモリプールの解放 */
   void free_pool() noexcept {
     postorder_destroy_nodes(root_);
-    alloc.deallocate(pool_, cap_);
+    alloc_.deallocate(pool_, cap_);
     root_ = pool_ = nullptr;
     size_ = cap_ = 0;
   }
 
   /**< @brief メモリプールの確保 */
   void allocate_pool(std::size_t n) {
-    pool_ = alloc.allocate(n);
+    pool_ = alloc_.allocate(n);
     cap_ = n;
   }
 
@@ -131,7 +133,7 @@ private:
   std::size_t cap_ = 0;  /**< ねじれヒープのバッファサイズ */
   std::size_t size_ = 0; /**< ねじれヒープのサイズ */
   node *pool_ = nullptr; /**< メモリプールへのポインタ */
-  Allocator alloc;       /**< アロケータ */
+  Allocator alloc_;      /**< アロケータ */
 };
 
 } // namespace container
