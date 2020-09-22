@@ -43,7 +43,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 
-add_definitions(-std=c++17)
+add_definitions(-std=c++20)
 file(GLOB SOURCE *.cpp src/*.cpp include/*.hpp)
 
 
