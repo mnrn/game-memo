@@ -12,14 +12,24 @@ cmake --no-warn-unused-cli -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_BUI
 cmake --build /path/to/build --parallel 10
 ```
 
+ビルドオプションはいまのところ、
+
+- Debug
+- RelWithDebInfo
+- Release
+- MinSizeRel
+
+の4つになります。
+
 今の所、MS には対応していませんが、そのうち対応させようかと考えています。
 
 ## Dependency
 
 - header-only
-  - [boost]
   - [fmt]
   - [catch2]
+- header & lib
+  - [boost]
 
 [boost] の依存関係の解決には必ず [boost-bcp] を用いて必要なものだけ third-party/boost に置いてください。
 

@@ -35,7 +35,7 @@ find_package(Boost COMPONENTS container REQUIRED)
 if (NOT Boost_FOUND)
     message(FATAL_ERROR "Could not find Boost!")
 else()
-    message("@@ Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
+    #message("@@ Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
     message("@@ Boost_LIBRARY_DIRS: ${Boost_LIBRARY_DIRS}")
 endif()
 
