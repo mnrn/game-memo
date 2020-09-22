@@ -134,14 +134,11 @@ private:
    * @return キーkに対応する付属データへのポインタ
    */
   node *find(node *x, const Key &k) const {
-    while (x != nullptr && neq(x->key, k)) {
-      if (cmp_(x->key, k)) {
-        x = x->left;
-      } else {
-        x = x->right;
-      }
+    if (x == nullptr || eq(x->key, k)) {
+      return x;
+    } else {
+      return find(cmp_(k, x->key) ? x->left : x->right, k);
     }
-    return x;
   }
 
   /**
@@ -341,9 +338,11 @@ private:
 
 private:
   /**< ＠brief キーlとキーrの非同値判定を行う */
-  bool neq(const Key &l, const Key &r) const {
+  inline bool neq(const Key &l, const Key &r) const {
     return (cmp_(l, r) || cmp_(r, l));
   }
+  /**< ＠brief キーlとキーrの同値判定を行う */
+  inline bool eq(const Key &l, const Key &r) const { return !neq(l, r); }
 
 private:
   node *root_;       /**< AVL木の根 */
