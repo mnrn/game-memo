@@ -283,7 +283,7 @@ private:
   node *create_node(const Key &k, const T &v) {
     BOOST_ASSERT_MSG(size_ < cap_, "AVL tree capacity over.");
     node *x = pool_ + size_;
-    alloc.construct(x, k, v);
+    alloc_.construct(x, k, v);
     size_++;
     return x;
   }
@@ -307,14 +307,14 @@ private:
   /**< @brief メモリプールの解放 */
   void free_pool() noexcept {
     postorder_destroy_nodes(root_);
-    alloc.deallocate(pool_, cap_);
+    alloc_.deallocate(pool_, cap_);
     root_ = pool_ = nullptr;
     size_ = cap_ = 0;
   }
 
   /**< @brief メモリプールの確保 */
   void allocate_pool(std::size_t n) {
-    pool_ = alloc.allocate(n);
+    pool_ = alloc_.allocate(n);
     cap_ = n;
   }
 
@@ -332,7 +332,7 @@ private:
   std::size_t cap_ = 0;  /**< AVL木のバッファサイズ    */
   std::size_t size_ = 0; /**< AVL木のサイズ           */
   node *pool_ = nullptr; /**< AVL木の節点用メモリプール */
-  Allocator alloc;       /**< アロケータ */
+  Allocator alloc_;      /**< アロケータ */
 };
 
 } // namespace container
