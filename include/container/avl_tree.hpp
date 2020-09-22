@@ -19,10 +19,36 @@
 #include <algorithm>
 #include <boost/assert.hpp>
 #include <boost/container/pmr/polymorphic_allocator.hpp>
+#include <memory>
 #include <optional>
 #include <utility>
 
 namespace container {
+
+namespace avl_tree_impl {
+template <class Key, class T> struct node {
+  using height_t = std::int32_t;
+  union {
+    struct {
+      node *left;  /**< 左の子    */
+      node *right; /**< 右の子    */
+    };
+    node *c[2]; /**< 左右の子(0:左, 1:右) */
+  };
+  height_t h; /**< 高さ */
+  union {
+    const Key key;             /**< キー    */
+    const char d[sizeof(Key)]; /**< ダミー  */
+  };
+  T v; /**< 付属データ */
+
+  constexpr node() noexcept : left(nullptr), right(nullptr), h(1), d("\0") {}
+  constexpr explicit node(const Key &k) noexcept
+      : left(nullptr), right(nullptr), h(1), key(k) {}
+  constexpr node(const Key &k, const T &v) noexcept
+      : left(nullptr), right(nullptr), h(1), key(k), v(v) {}
+};
+} // namespace avl_tree_impl
 
 /**
  * @brief  AVL木
@@ -30,35 +56,16 @@ namespace container {
  * @tparam T       付属データの型
  * @tparam Compare キーを引数にとる比較述語の型
  */
-template <class Key, class T, class Compare = std::less<Key>> struct avl_tree {
+template <class Key, class T, class Compare = std::less<Key>,
+          class Allocator = boost::container::pmr::polymorphic_allocator<
+              avl_tree_impl::node<Key, T>>>
+struct avl_tree {
   static_assert(std::is_nothrow_constructible_v<Key> &&
                 std::is_nothrow_constructible_v<T>);
-  using height_t = std::int32_t;
   using sides_t = std::int32_t;
   using pair_t = std::pair<const Key, T>;
-
-  struct node {
-    union {
-      struct {
-        node *left;  /**< 左の子    */
-        node *right; /**< 右の子    */
-      };
-      node *c[2]; /**< 左右の子(0:左, 1:右) */
-    };
-    height_t h; /**< 高さ */
-    union {
-      const Key key;             /**< キー    */
-      const char d[sizeof(Key)]; /**< ダミー  */
-    };
-    T v; /**< 付属データ */
-
-    constexpr node() noexcept
-        : left(nullptr), right(nullptr), h(1), d("\0"), next(nullptr) {}
-    constexpr explicit node(const Key &k) noexcept
-        : left(nullptr), right(nullptr), h(1), key(k), next(nullptr) {}
-    constexpr node(const Key &k, const T &v) noexcept
-        : left(nullptr), right(nullptr), h(1), key(k), v(v), next(nullptr) {}
-  };
+  using node = avl_tree_impl::node<Key, T>;
+  using height_t = typename node::height_t;
 
   explicit avl_tree(std::size_t n = 32) { allocate_pool(n); }
   ~avl_tree() noexcept { free_pool(); } // 確保した記憶領域の解放
@@ -325,7 +332,7 @@ private:
   std::size_t cap_ = 0;  /**< AVL木のバッファサイズ    */
   std::size_t size_ = 0; /**< AVL木のサイズ           */
   node *pool_ = nullptr; /**< AVL木の節点用メモリプール */
-  boost::container::pmr::polymorphic_allocator<node> alloc{};
+  Allocator alloc;       /**< アロケータ */
 };
 
 } // namespace container

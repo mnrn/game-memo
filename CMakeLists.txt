@@ -109,6 +109,6 @@ set(TEST_TARGETS
     stack
     queue
     skew_heap
-    #avl_tree
+    avl_tree
 )
 testAll()
