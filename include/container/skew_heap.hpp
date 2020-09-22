@@ -31,10 +31,7 @@ public:
           key(std::forward<Args>(args)...) {}
   };
 
-  explicit skew_heap(std::size_t n = 32)
-      : root_(nullptr), cap_(0), size_(0), pool_(nullptr), free_(nullptr) {
-    allocate_pool(n);
-  }
+  explicit skew_heap(std::size_t n = 32) { allocate_pool(n); }
   ~skew_heap() noexcept { free_pool(); }
 
   /** @brief ねじれヒープHに要素xを挿入する @param const Key& key 要素xのキー */
@@ -104,7 +101,7 @@ private:
     }
     postorder_destroy_nodes(x->left);
     postorder_destroy_nodes(x->right);
-    alloc.destroy(x->key);
+    alloc.destroy(x);
   }
 
   /**< @brief メモリプールの解放 */
@@ -124,7 +121,7 @@ private:
   std::size_t cap_ = 0;  /**< ねじれヒープのバッファサイズ */
   std::size_t size_ = 0; /**< ねじれヒープのサイズ */
   node *pool_ = nullptr;
-  std::experimental::pmr::popymorphic_allocator<node> alloc{};
+  std::experimental::pmr::polymorphic_allocator<node> alloc{};
 };
 
 } // namespace container

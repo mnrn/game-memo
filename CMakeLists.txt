@@ -19,14 +19,17 @@ include_directories(src)
 # Select compiler
 set(CMAKE_CXX_COMPILER /usr/local/opt/llvm/bin/clang++ CACHE PATH "" FORCE) 
 
+
 # Compile mode
 set(CMAKE_CXX_FLAGS_DEBUG           "${CMAKE_CXX_FLAGS_DEBUG}           -DDEBUG  -g")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO, "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}           -g      -O3")
 set(CMAKE_CXX_FLAGS_RELEASE,        "${CMAKE_CXX_FLAGS_RELEASE}         -DNDEBUG         -O4 -flto ")
 set(CMAKE_CXX_FLAGS_MINSIZEREL,     "${CMAKE_CXX_FLAGS_MINSIZEREL}      -DNDEBUG         -Oz")
 
+
 # Resolve dependency
 find_package(Threads REQUIRED)
+
 
 # Set preprocessor defines
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOMINMAX -D_USE_MATH_DEFINES")
@@ -44,6 +47,7 @@ endif()
 
 
 add_definitions(-std=c++17)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 file(GLOB SOURCE *.cpp src/*.cpp include/*.hpp)
 
 
@@ -79,7 +83,7 @@ function(testAll)
     endforeach(TEST_TARGET)
 endfunction(testAll)
 
-#link_libraries(${} ${})
+link_libraries()
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/")
 
 # TODO: hello -> directory that you want build.
