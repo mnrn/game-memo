@@ -59,50 +59,11 @@ template <class Key, class T, class Compare = std::less<Key>> struct avl_tree {
         : left(nullptr), right(nullptr), h(1), key(k), v(v), next(nullptr) {}
   };
 
-  node *root_;  /**< AVL木の根 */
-  Compare cmp_; /**< 比較述語  */
-
-  std::size_t cap_;  /**< AVL木のバッファサイズ    */
-  std::size_t size_; /**< AVL木のサイズ           */
-  node *pool_;       /**< AVL木の節点用メモリプール */
-  node *free_;       /**< 空き節点へのポインタ     */
-
   explicit avl_tree(std::size_t n = 32)
       : root_(nullptr), cap_(n), size_(0), pool_(nullptr), free_(nullptr) {
     allocate_pool(n);
   }
   ~avl_tree() noexcept { free_pool(); } // 確保した記憶領域の解放
-
-  /**
-   * @brief  中間順木巡回を行う
-   * @note   n個の節点を持つ2分探索木の巡回はΘ(n)かかる
-   * @tparam class F const Key&を引数に取る関数オブジェクトの型
-   * @param F fn     const T&を引数に取る関数オブジェクト
-   */
-  template <class F> void inorder(F fn) { inorder(root_, fn); }
-
-  /**
-   * @brief AVL木Tにキーkの挿入を行う
-   * @note  実行時間はΟ(lgn)
-   * @param const Key& k キーk
-   * @param const T& v   付属データv
-   */
-  std::optional<T> insert(const Key &k, const T &v) {
-    std::optional<T> opt = std::nullopt;
-    root_ = insert(root_, k, v, opt);
-    return opt;
-  }
-
-  /**
-   * @brief AVL木Tからキーkを持つ節点の削除を行う
-   * @note  実行時間はΟ(lgn)
-   * @param const Key& k キーk
-   */
-  std::optional<T> erase(const Key &k) {
-    std::optional<T> opt = std::nullopt;
-    root_ = erase(root_, k, opt);
-    return opt;
-  }
 
   /**
    * @brief  AVL木からキーkに対応する付属データを返す
@@ -114,6 +75,39 @@ template <class Key, class T, class Compare = std::less<Key>> struct avl_tree {
     const node *x = find(root_, k);
     return x == nullptr ? std::nullopt : std::make_optional(x->v);
   }
+
+  /**
+   * @brief AVL木Tにキーkの挿入を行う
+   * @note  実行時間はΟ(lgn)
+   * @param const Key& k キーk
+   * @param const T& v   付属データv
+   * @return キーkに対応していた付属データ
+   */
+  std::optional<T> insert(const Key &k, const T &v) {
+    std::optional<T> opt = std::nullopt;
+    root_ = insert(root_, k, v, opt);
+    return opt;
+  }
+
+  /**
+   * @brief AVL木Tからキーkを持つ節点の削除を行う
+   * @note  実行時間はΟ(lgn)
+   * @param const Key& k キーk
+   * @return キーkに対応していた付属データ
+   */
+  std::optional<T> erase(const Key &k) {
+    std::optional<T> opt = std::nullopt;
+    root_ = erase(root_, k, opt);
+    return opt;
+  }
+
+  /**
+   * @brief  中間順木巡回を行う
+   * @note   n個の節点を持つ2分探索木の巡回はΘ(n)かかる
+   * @tparam class F const Key&を引数に取る関数オブジェクトの型
+   * @param F fn     const T&を引数に取る関数オブジェクト
+   */
+  template <class F> void inorder(F fn) { inorder(root_, fn); }
 
 private:
   /**
@@ -157,7 +151,7 @@ private:
    */
   node *insert(node *x, const Key &k, const T &v, std::optional<T> &opt) {
     if (x == nullptr) {
-      return create_node(x, k, v);
+      return create_node(k, v);
     }                      // xがNILを指すとき、再帰は底をつく
     if (cmp_(k, x->key)) { // xの適切な子に再帰し、
       x->left = insert(x->left, k, v, opt);
@@ -166,6 +160,7 @@ private:
     } else {
       opt = x->v;
       x->v = v;
+      return x;
     }
     return balance(x); // xを根とする部分木を高さ平衡にする
   }
@@ -288,7 +283,7 @@ private:
     }
     node *x = free_;
     free_ = x->next;
-    construct(x, std::forward<Args>(args)...);
+    new (x) node(k, v);
     size_++;
     return x;
   }
@@ -349,6 +344,14 @@ private:
   bool neq(const Key &l, const Key &r) const {
     return (cmp_(l, r) || cmp_(r, l));
   }
+
+private:
+  node *root_;       /**< AVL木の根 */
+  Compare cmp_;      /**< 比較述語  */
+  std::size_t cap_;  /**< AVL木のバッファサイズ    */
+  std::size_t size_; /**< AVL木のサイズ           */
+  node *pool_;       /**< AVL木の節点用メモリプール */
+  node *free_;       /**< 空き節点へのポインタ     */
 };
 
 } // namespace container
