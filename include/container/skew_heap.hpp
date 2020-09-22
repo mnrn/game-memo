@@ -43,7 +43,7 @@ public:
 
   /** @brief ねじれヒープHに要素xを挿入する @param const Key& key 要素xのキー */
   template <class... Args> void push(Args &&... args) {
-    BOOST_ASSERT_MSG(!full(), "Skew heap overflow");
+    BOOST_ASSERT_MSG(!full(), "Skew heap capcity over.");
     node *x = create_node(std::forward<Args>(args)...);
     root_ = merge(root_, x);
     size_++;
