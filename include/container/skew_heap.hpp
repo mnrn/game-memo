@@ -50,7 +50,7 @@ public:
 
   /**< @brief ねじれヒープHから先頭のキーを取り出し、要素を削除する */
   std::optional<Key> pop() noexcept {
-    if (empty() || root_ == nullptr) {
+    if (empty()) {
       return std::nullopt;
     }
     Key k = root_->key;
