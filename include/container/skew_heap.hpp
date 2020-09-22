@@ -6,8 +6,9 @@
 #define SKEW_HEAP_HPP
 
 #include <algorithm>
+#include <boost/assert.hpp>
+#include <boost/container/pmr/polymorphic_allocator.hpp>
 #include <cassert>
-#include <experimental/memory_resource>
 #include <optional>
 
 namespace container {
@@ -36,7 +37,7 @@ public:
 
   /** @brief ねじれヒープHに要素xを挿入する @param const Key& key 要素xのキー */
   template <class... Args> void push(Args &&... args) {
-    assert(!full());
+    BOOST_ASSERT_MSG(!full(), "sker heap overflow");
     node *x = create_node(std::forward<Args>(args)...);
     root_ = merge(root_, x);
     size_++;
@@ -101,7 +102,7 @@ private:
     }
     postorder_destroy_nodes(x->left);
     postorder_destroy_nodes(x->right);
-    alloc.destroy(x);
+    destroy_node(x);
   }
 
   /**< @brief メモリプールの解放 */
@@ -113,7 +114,10 @@ private:
   }
 
   /**< @brief メモリプールの確保 */
-  void allocate_pool(std::size_t n) { pool_ = alloc.allocate(n); }
+  void allocate_pool(std::size_t n) {
+    pool_ = alloc.allocate(n);
+    cap_ = n;
+  }
 
 private:
   node *root_ = nullptr; /**< 木の根   */
@@ -121,7 +125,7 @@ private:
   std::size_t cap_ = 0;  /**< ねじれヒープのバッファサイズ */
   std::size_t size_ = 0; /**< ねじれヒープのサイズ */
   node *pool_ = nullptr;
-  std::experimental::pmr::polymorphic_allocator<node> alloc{};
+  boost::container::pmr::polymorphic_allocator<node> alloc{};
 };
 
 } // namespace container

@@ -29,6 +29,16 @@ set(CMAKE_CXX_FLAGS_MINSIZEREL,     "${CMAKE_CXX_FLAGS_MINSIZEREL}      -DNDEBUG
 
 # Resolve dependency
 find_package(Threads REQUIRED)
+set(Boost_USE_STATIC_LIBS ON)
+set(Boost_LIBRARY_DIRS "${CMAKE_SOURCE_DIR}/lib/boost")
+find_package(Boost COMPONENTS container REQUIRED)
+if (NOT Boost_FOUND)
+    message(FATAL_ERROR "Could not find Boost!")
+else()
+    message("@@ Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
+    message("@@ Boost_LIBRARY_DIRS: ${Boost_LIBRARY_DIRS}")
+endif()
+
 
 
 # Set preprocessor defines
@@ -46,8 +56,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 
-add_definitions(-std=c++17)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+add_definitions(-std=c++20)
 file(GLOB SOURCE *.cpp src/*.cpp include/*.hpp)
 
 
@@ -66,6 +75,7 @@ function(build DIR_NAME TARGET_NAME)
     )
     target_link_libraries(${TARGET_NAME} 
         ${CMAKE_THREAD_LIBS_INIT}
+        ${Boost_LIBRARIES}
     )
 endfunction(build)
 
@@ -83,7 +93,7 @@ function(testAll)
     endforeach(TEST_TARGET)
 endfunction(testAll)
 
-link_libraries()
+#link_libraries()
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/")
 
 # TODO: hello -> directory that you want build.
@@ -99,5 +109,6 @@ set(TEST_TARGETS
     stack
     queue
     skew_heap
+    avl_tree
 )
 testAll()
