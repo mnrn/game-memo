@@ -92,7 +92,7 @@ template <class Key, class T, class Compare = std::less<Key>> struct avl_tree {
   /**
    * @brief AVL木Tからキーkを持つ節点の削除を行う
    * @note  実行時間はΟ(lgn)
-   * @param const Key& k キーk
+   * @param const Key&git  k キーk
    * @return キーkに対応していた付属データ
    */
   std::optional<T> erase(const Key &k) {
@@ -207,19 +207,19 @@ private:
     if (bias(x) > 1) {  // 左に2つ分偏っている場合、left-left
                         // caseおよびleft-right caseが考えられる
       if (bias(x->left) < 0) {
-        x->left = rotate(x->left, 0, 1);
+        x->left = left_rotate(x->left);
       } // left-right caseならば、左回転を行うことで、left-left caseに帰着させる
-      return rotate(x, 1, 0); // 右回転を行うことでleft-left
+      return right_rotate(x); // 右回転を行うことでleft-left
                               // caseを解消し、高さ平衡を満たす部分木の根を返す
     }
     if (bias(x) < -1) { // 右に2つ分偏っている場合、right-right
                         // caseおよびright-left caseが考えられる
       if (bias(x->right) > 0) {
-        x->right = rotate(x->right, 1, 0);
+        x->right = right_rotate(x->right);
       } // right-left caseならば、右回転を行うことで、right-right
         // caseに帰着させる
-      return rotate(x, 0, 1); // 左回転を行うことでright-right
-                              // caseを解消し、高さ平衡を満たす部分木の根を返す
+      return left_rotate(x); // 左回転を行うことでright-right
+                             // caseを解消し、高さ平衡を満たす部分木の根を返す
     }
     return x; // 高さ平衡の場合、xを返す
   }
@@ -240,6 +240,9 @@ private:
     y->h = reheight(y); // yの高さを更新する
     return y;           // 部分木の新しい根yを返す
   }
+  static node *left_rotate(node *x) { return rotate(x, 0, 1); }
+  static node *right_rotate(node *x) { return rotate(x, 1, 0); }
+
   /**
    * @brief 節点xを根とする部分木の中から最も左にある子を取得する
    * @param node*x 節点x
@@ -261,12 +264,10 @@ private:
 private:
   /**< @brief 節点xの高さを取得する  */
   static constexpr height_t height(node *x) noexcept { return x ? x->h : 0; }
-
   /**< @brief 節点xの更新される高さを返す */
   static constexpr height_t reheight(node *x) noexcept {
     return std::max(height(x->left), height(x->right)) + 1;
   }
-
   /**< @brief 節点xの左右の子の高さの差(x.left - x.right)を返す */
   static constexpr height_t bias(node *x) noexcept {
     return height(x->left) - height(x->right);
@@ -280,7 +281,7 @@ private:
     }
     node *x = free_;
     free_ = x->next;
-    new (x) node(k, v);
+    construct(x, k, v);
     size_++;
     return x;
   }
