@@ -23,7 +23,6 @@ public:
   static_assert(std::is_nothrow_constructible_v<Key>);
   struct node {
     node *left, *right; /**< 左右の子 */
-    node *next;         /**< 単方向未使用リストL */
     Key key;            /**< キー */
     constexpr node() noexcept : left(nullptr), right(nullptr), next(nullptr) {}
     template <class... Args>
