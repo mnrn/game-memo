@@ -108,8 +108,8 @@ private:
   /**< @brief メモリプールの解放 */
   void free_pool() noexcept {
     postorder_destroy_nodes(root_);
-    alloc.deallocate(pool_, size_);
-    root_ = nullptr;
+    alloc.deallocate(pool_, cap_);
+    root_ = pool_ = nullptr;
     size_ = cap_ = 0;
   }
 

@@ -17,6 +17,8 @@
 
 #include "container.hpp"
 #include <algorithm>
+#include <boost/assert.hpp>
+#include <boost/container/pmr/polymorphic_allocator.hpp>
 #include <optional>
 #include <utility>
 
@@ -59,10 +61,7 @@ template <class Key, class T, class Compare = std::less<Key>> struct avl_tree {
         : left(nullptr), right(nullptr), h(1), key(k), v(v), next(nullptr) {}
   };
 
-  explicit avl_tree(std::size_t n = 32)
-      : root_(nullptr), cap_(n), size_(0), pool_(nullptr), free_(nullptr) {
-    allocate_pool(n);
-  }
+  explicit avl_tree(std::size_t n = 32) { allocate_pool(n); }
   ~avl_tree() noexcept { free_pool(); } // 確保した記憶領域の解放
 
   /**
@@ -276,31 +275,18 @@ private:
 private:
   /**< @brief 節点xの記憶領域の確保を行う */
   node *create_node(const Key &k, const T &v) {
-    if (free_ == nullptr) {
-      return nullptr;
-    }
-    node *x = free_;
-    free_ = x->next;
-    construct(x, k, v);
+    BOOST_ASSERT_MSG(size_ < cap_, "AVL tree capacity over.");
+    node *x = pool_ + size_;
+    alloc.construct(x, k, v);
     size_++;
     return x;
   }
 
   /**< @brief 節点xの記憶領域の解放を行う */
   void destroy_node(node *x) noexcept {
-    destroy(x);
-    x->next = free_;
-    free_ = x;
+    container::destroy(x);
     size_--;
   }
-
-  /**< @brief 節点n個分の記憶領域を確保する */
-  node *allocate_nodes(std::size_t n) {
-    return static_cast<node *>(::operator new(sizeof(node) * n, std::nothrow));
-  }
-
-  /**< @brief 節点xの記憶領域を解放する */
-  void free_node(node *x) noexcept { ::operator delete(x); }
 
   /**< @brief 節点xを根とした部分木を再帰的に解放する*/
   void postorder_destroy_nodes(node *x) noexcept {
@@ -315,25 +301,14 @@ private:
   /**< @brief メモリプールの解放 */
   void free_pool() noexcept {
     postorder_destroy_nodes(root_);
-    free_node(pool_);
-    root_ = pool_ = free_ = nullptr;
+    alloc.deallocate(pool_, cap_);
+    root_ = pool_ = nullptr;
     size_ = cap_ = 0;
   }
 
   /**< @brief メモリプールの確保 */
   void allocate_pool(std::size_t n) {
-    if (n == 0) {
-      return;
-    }
-    pool_ = allocate_nodes(n); // 節点n個分の記憶領域確保
-    if (pool_ == nullptr) {
-      return;
-    }
-    for (std::size_t i = 0; i < n - 1; i++) {
-      pool_[i].next = &pool_[i + 1];
-    }
-    pool_[n - 1].next = nullptr;
-    free_ = pool_; // 空き節点へのポインタを保持しておく
+    pool_ = alloc.allocate(n);
     cap_ = n;
   }
 
@@ -346,12 +321,12 @@ private:
   inline bool eq(const Key &l, const Key &r) const { return !neq(l, r); }
 
 private:
-  node *root_;       /**< AVL木の根 */
-  Compare cmp_;      /**< 比較述語  */
-  std::size_t cap_;  /**< AVL木のバッファサイズ    */
-  std::size_t size_; /**< AVL木のサイズ           */
-  node *pool_;       /**< AVL木の節点用メモリプール */
-  node *free_;       /**< 空き節点へのポインタ     */
+  node *root_ = nullptr; /**< AVL木の根 */
+  Compare cmp_;          /**< 比較述語  */
+  std::size_t cap_ = 0;  /**< AVL木のバッファサイズ    */
+  std::size_t size_ = 0; /**< AVL木のサイズ           */
+  node *pool_ = nullptr; /**< AVL木の節点用メモリプール */
+  boost::container::pmr::polymorphic_allocator<node> alloc{};
 };
 
 } // namespace container
