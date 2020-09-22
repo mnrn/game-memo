@@ -87,10 +87,10 @@ template <class Key, class T, class Compare = std::less<Key>> struct avl_tree {
    * @param const Key& k キーk
    * @param const T& v   付属データv
    */
-  void insert(const Key &k, const T &v) {
-    node *z = create_node(k, v);
-    assert(z != nullptr);
-    root_ = insert(root_, k, v);
+  std::optional<T> insert(const Key &k, const T &v) {
+    std::optional<T> opt = std::nullopt;
+    root_ = insert(root_, k, v, opt);
+    return opt;
   }
 
   /**
@@ -98,9 +98,10 @@ template <class Key, class T, class Compare = std::less<Key>> struct avl_tree {
    * @note  実行時間はΟ(lgn)
    * @param const Key& k キーk
    */
-  void erase(const Key &k) {
-    assert(root_ != nullptr);
-    root_ = erase(root_, k);
+  std::optional<T> erase(const Key &k) {
+    std::optional<T> opt = std::nullopt;
+    root_ = erase(root_, k, opt);
+    return opt;
   }
 
   /**
@@ -154,15 +155,16 @@ private:
    * @param node*x       節点x
    * @param node*z       キーkを持つ節点z
    */
-  node *insert(node *x, const Key &k, const T &v) {
+  node *insert(node *x, const Key &k, const T &v, std::optional<T> &opt) {
     if (x == nullptr) {
       return create_node(x, k, v);
     }                      // xがNILを指すとき、再帰は底をつく
     if (cmp_(k, x->key)) { // xの適切な子に再帰し、
-      x->left = insert(x->left, k, v);
+      x->left = insert(x->left, k, v, opt);
     } else if (cmp_(x->key, k)) {
-      x->right = insert(x->right, k, v);
+      x->right = insert(x->right, k, v, opt);
     } else {
+      opt = x->v;
       x->v = v;
     }
     return balance(x); // xを根とする部分木を高さ平衡にする
@@ -173,18 +175,19 @@ private:
    * @param node*x       節点x
    * @param const Key& k キーk
    */
-  node *erase(node *x, const Key &k) {
+  node *erase(node *x, const Key &k, std::optional<T> &opt) {
     if (x == nullptr) {
       return nullptr;
     } // キーkはAVL木Tに存在しなかった
     if (cmp_(k, x->key)) {
-      x->left = erase(x->left, k);
+      x->left = erase(x->left, k, opt);
       return balance(x);
     } // xの適切な子に再帰し、
     if (cmp_(x->key, k)) {
-      x->right = erase(x->right, k);
+      x->right = erase(x->right, k, opt);
       return balance(x);
     } // xを根とする部分木を高さ平衡にする
+    opt = x->v;
     node *y = x->left,
          *z = x->right; // x.key == kのとき、yをxの左の子、zをxの右の子とし、
     destroy_node(x); // xを解放する
