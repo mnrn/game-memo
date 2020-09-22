@@ -7,29 +7,35 @@
 
 #include <algorithm>
 #include <boost/assert.hpp>
-#include <boost/container/pmr/polymorphic_allocator.hpp>
 #include <cassert>
+#include <memory>
 #include <optional>
 
 namespace container {
+
+namespace skew_heap_impl {
+template <class Key> struct node {
+  node *left = nullptr;  /**< 左の子 */
+  node *right = nullptr; /**< 右の子 */
+  Key key;               /**< キー */
+  template <class... Args>
+  constexpr explicit node(Args &&... args) noexcept
+      : key(std::forward<Args>(args)...) {}
+};
+} // namespace skew_heap_impl
 
 /**
  * @brief  ねじれヒープ
  * @tparam Key     キーの型
  * @tparam Compare 比較述語の型
  */
-template <class Key, class Compare = std::less<Key>> struct skew_heap {
+template <class Key,
+          class Allocator = std::allocator<skew_heap_impl::node<Key>>,
+          class Compare = std::less<Key>>
+struct skew_heap {
 public:
   static_assert(std::is_nothrow_constructible_v<Key>);
-  struct node {
-    node *left, *right; /**< 左右の子 */
-    Key key;            /**< キー */
-    constexpr node() noexcept : left(nullptr), right(nullptr), next(nullptr) {}
-    template <class... Args>
-    constexpr explicit node(Args &&... args) noexcept
-        : left(nullptr), right(nullptr), next(nullptr),
-          key(std::forward<Args>(args)...) {}
-  };
+  using node = skew_heap_impl::node<Key>;
 
   explicit skew_heap(std::size_t n = 32) { allocate_pool(n); }
   ~skew_heap() noexcept { free_pool(); }
@@ -123,8 +129,8 @@ private:
   Compare cmp_;          /**< 比較述語 */
   std::size_t cap_ = 0;  /**< ねじれヒープのバッファサイズ */
   std::size_t size_ = 0; /**< ねじれヒープのサイズ */
-  node *pool_ = nullptr;
-  boost::container::pmr::polymorphic_allocator<node> alloc{};
+  node *pool_ = nullptr; /**< メモリプールへのポインタ */
+  Allocator alloc;       /**< アロケータ */
 };
 
 } // namespace container
