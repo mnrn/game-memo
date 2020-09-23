@@ -38,8 +38,15 @@ else()
     #message("@@ Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
     message("@@ Boost_LIBRARY_DIRS: ${Boost_LIBRARY_DIRS}")
 endif()
-
-
+set(JEMALLOC_HOME "${CMAKE_SOURCE_DIR}")
+find_package(jemalloc)
+if (NOT JEMALLOC_FOUND)
+    message(FATAL_ERROR "Could not find jemalloc!")
+else()
+    #message("@@ Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
+    message("@@JEMALLOC_SHARED_LIB : ${JEMALLOC_SHARED_LIB}")
+    message("@@JEMALLOC_STATIC_LIB : ${JEMALLOC_STATIC_LIB}")
+endif()
 
 # Set preprocessor defines
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOMINMAX -D_USE_MATH_DEFINES")
@@ -76,6 +83,7 @@ function(build DIR_NAME TARGET_NAME)
     target_link_libraries(${TARGET_NAME} 
         ${CMAKE_THREAD_LIBS_INIT}
         ${Boost_LIBRARIES}
+        ${JEMALLOC_SHARED_LIB}
     )
 endfunction(build)
 
