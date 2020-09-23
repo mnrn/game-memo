@@ -30,6 +30,7 @@ cmake --build /path/to/build --parallel 10
   - [catch2]
 - header & lib
   - [boost]
+  - [jemalloc]
 
 [boost] の依存関係の解決には必ず [boost-bcp] を用いて必要なものだけ third-party/boost に置いてください。
 
@@ -42,6 +43,9 @@ cmake --build /path/to/build --parallel 10
 ├── .gitignore
 ├── LICENSE
 ├── CMakeList.txt
+├── cmake
+│  ├── FindXXX.cpp
+│  └── ...
 ├── projects
 │  ├── project1
 │  │  ├── main.cpp
@@ -91,3 +95,4 @@ cmake --build /path/to/build --parallel 10
 [catch2]:<https://github.com/catchorg/Catch2>
 [fmt]:<https://github.com/fmtlib/fmt>
 [boost-bcp]:<https://www.boost.org/doc/libs/tools/bcp/doc/html/index.html>
+[jemalloc]:<http://jemalloc.net/>
