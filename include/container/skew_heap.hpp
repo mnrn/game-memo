@@ -63,7 +63,7 @@ public:
   constexpr bool empty() const noexcept { return root_ == nullptr; }
 
   /**< @brief ねじれヒープHが満杯かどうか返す */
-  constexpr bool full() const noexcept { return size_ == cap_; }
+  constexpr bool full() const noexcept { return size_ >= cap_; }
 
 private:
   /**
