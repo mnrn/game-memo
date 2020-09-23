@@ -44,7 +44,7 @@ cmake --build /path/to/build --parallel 10
 ├── LICENSE
 ├── CMakeList.txt
 ├── cmake
-│  ├── FindXXX.cpp
+│  ├── FindXXX.cmake
 │  └── ...
 ├── projects
 │  ├── project1
