@@ -14,16 +14,14 @@
 
 namespace container {
 
-namespace skew_heap_impl {
-template <class Key> struct node {
-  node *left = nullptr;  /**< 左の子 */
-  node *right = nullptr; /**< 右の子 */
-  Key key;               /**< キー */
+template <class Key> struct skew_heap_node {
+  skew_heap_node *left = nullptr;  /**< 左の子 */
+  skew_heap_node *right = nullptr; /**< 右の子 */
+  Key key;                         /**< キー */
   template <class... Args>
-  constexpr explicit node(Args &&... args) noexcept
+  constexpr explicit skew_heap_node(Args &&... args) noexcept
       : key(std::forward<Args>(args)...) {}
 };
-} // namespace skew_heap_impl
 
 /**
  * @brief  ねじれヒープ
@@ -31,12 +29,12 @@ template <class Key> struct node {
  * @tparam Compare 比較述語の型
  */
 template <class Key, class Compare = std::less<Key>,
-          class Allocator = boost::container::pmr::polymorphic_allocator<
-              skew_heap_impl::node<Key>>>
+          class Allocator =
+              boost::container::pmr::polymorphic_allocator<skew_heap_node<Key>>>
 struct skew_heap {
 public:
   static_assert(std::is_nothrow_constructible_v<Key>);
-  using node = skew_heap_impl::node<Key>;
+  using node = skew_heap_node<Key>;
 
   explicit skew_heap(std::size_t n = 32) { allocate_pool(n); }
   ~skew_heap() noexcept { free_pool(); }

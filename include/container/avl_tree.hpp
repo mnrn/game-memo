@@ -25,24 +25,22 @@
 
 namespace container {
 
-namespace avl_tree_impl {
-template <class Key, class T> struct node {
+template <class Key, class T> struct avl_tree_node {
   using height_t = std::int32_t;
   union {
     struct {
-      node *left;  /**< 左の子    */
-      node *right; /**< 右の子    */
+      avl_tree_node *left;  /**< 左の子    */
+      avl_tree_node *right; /**< 右の子    */
     };
-    node *c[2]; /**< 左右の子(0:左, 1:右) */
+    avl_tree_node *c[2]; /**< 左右の子(0:左, 1:右) */
   };
   height_t h; /**< 高さ */
   Key key;    /**< キー    */
   T v;        /**< 付属データ */
 
-  constexpr node(const Key &k, const T &v) noexcept
+  constexpr avl_tree_node(const Key &k, const T &v) noexcept
       : left(nullptr), right(nullptr), h(1), key(k), v(v) {}
 };
-} // namespace avl_tree_impl
 
 /**
  * @brief  AVL木
@@ -52,13 +50,13 @@ template <class Key, class T> struct node {
  */
 template <class Key, class T, class Compare = std::less<Key>,
           class Allocator = boost::container::pmr::polymorphic_allocator<
-              avl_tree_impl::node<Key, T>>>
+              avl_tree_node<Key, T>>>
 struct avl_tree {
   static_assert(std::is_nothrow_constructible_v<Key> &&
                 std::is_nothrow_constructible_v<T>);
   using sides_t = std::int32_t;
   using pair_t = std::pair<const Key, T>;
-  using node = avl_tree_impl::node<Key, T>;
+  using node = avl_tree_node<Key, T>;
   using height_t = typename node::height_t;
 
   explicit avl_tree(std::size_t n = 32) { allocate_pool(n); }
