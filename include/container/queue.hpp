@@ -46,7 +46,7 @@ public:
     if (empty()) { // アンダーフローチェック
       return std::nullopt;
     }
-    T front = Q_[head_];
+    decltype(auto) front = Q_[head_];
     destroy(Q_[head_]);         // デストラクタ呼び出し
     head_ = (head_ + 1) % cap_; // 循環処理
     return std::make_optional(front);

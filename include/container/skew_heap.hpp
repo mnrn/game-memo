@@ -50,7 +50,7 @@ public:
     if (empty()) {
       return std::nullopt;
     }
-    Key k = root_->key;
+    decltype(auto) k = root_->key;
     node *x = root_;
     root_ = merge(x->left, x->right);
     destroy_node(x);

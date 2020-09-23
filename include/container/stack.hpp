@@ -45,7 +45,7 @@ public:
     if (empty()) { // アンダーフローチェック
       return std::nullopt;
     }
-    T top = S_[top_ - 1];
+    decltype(auto) top = S_[top_ - 1];
     destroy(S_[--top_]); // デストラクタ呼び出し
     return std::make_optional(top);
   }
