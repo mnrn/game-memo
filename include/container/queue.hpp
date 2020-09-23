@@ -23,6 +23,7 @@ template <class T,
           class Allocator = boost::container::pmr::polymorphic_allocator<T>>
 struct queue {
 public:
+  static_assert(std::is_nothrow_constructible_v<T>);
   explicit queue(std::int32_t n = 32) { allocate_queue(n); };
   ~queue() noexcept { free_queue(); };
 
@@ -45,17 +46,17 @@ public:
     if (empty()) { // アンダーフローチェック
       return std::nullopt;
     }
-    decltype(auto) front = Q_[head_];
+    T front = Q_[head_];
     destroy(Q_[head_]);         // デストラクタ呼び出し
     head_ = (head_ + 1) % cap_; // 循環処理
     return std::make_optional(front);
   }
 
 private:
+  T *Q_ = nullptr;        /**< キューQ */
   std::int32_t head_ = 0; /**< キューQの先頭 */
   std::int32_t tail_ = 0; /**< キューQの末尾 */
   std::int32_t cap_ = 0;  /**< キューQのバッファサイズ */
-  T *Q_ = nullptr;        /**< キューQ */
   Allocator alloc_;       /**< アロケータ */
 
 private:
@@ -78,6 +79,8 @@ private:
   void free_queue() noexcept {
     destroy_queue<T>();
     alloc_.deallocate(Q_, cap_); /* 記憶領域の解放 */
+    head_ = tail_ = cap_ = 0;
+    Q_ = nullptr;
   }
   /**< @brief キューを確保する */
   void allocate_queue(std::size_t n) {

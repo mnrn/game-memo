@@ -23,6 +23,7 @@ template <class T,
           class Allocator = boost::container::pmr::polymorphic_allocator<T>>
 struct stack {
 public:
+  static_assert(std::is_nothrow_constructible_v<T>);
   explicit stack(std::size_t n = 32) { allocate_stack(n); }
   ~stack() noexcept { free_stack(); }
 
@@ -53,9 +54,9 @@ public:
   constexpr std::size_t size() const noexcept { return top_; }
 
 private:
+  T *S_ = nullptr;      /**< スタックS */
   std::size_t top_ = 0; /**< スタックトップ */
   std::size_t cap_ = 0; /**< スタックSのバッファサイズ */
-  T *S_ = nullptr;      /**< スタックS */
   Allocator alloc_;     /**<* アロケータ */
 
 private:
@@ -73,6 +74,8 @@ private:
   void free_stack() noexcept {
     destroy_stack<T>();
     alloc_.deallocate(S_, cap_);
+    top_ = cap_ = 0;
+    S_ = nullptr;
   }
   /**< @brief スタックを確保する */
   void allocate_stack(std::size_t n) {
