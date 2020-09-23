@@ -36,15 +36,9 @@ template <class Key, class T> struct node {
     node *c[2]; /**< 左右の子(0:左, 1:右) */
   };
   height_t h; /**< 高さ */
-  union {
-    const Key key;             /**< キー    */
-    const char d[sizeof(Key)]; /**< ダミー  */
-  };
-  T v; /**< 付属データ */
+  Key key;    /**< キー    */
+  T v;        /**< 付属データ */
 
-  constexpr node() noexcept : left(nullptr), right(nullptr), h(1), d("\0") {}
-  constexpr explicit node(const Key &k) noexcept
-      : left(nullptr), right(nullptr), h(1), key(k) {}
   constexpr node(const Key &k, const T &v) noexcept
       : left(nullptr), right(nullptr), h(1), key(k), v(v) {}
 };
