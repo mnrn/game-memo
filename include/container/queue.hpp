@@ -10,6 +10,7 @@
 #include <boost/container/pmr/polymorphic_allocator.hpp>
 #include <cassert>
 #include <cstdint>
+#include <memory>
 #include <optional>
 #include <type_traits>
 
@@ -24,6 +25,8 @@ template <class T,
 struct queue {
 public:
   static_assert(std::is_nothrow_constructible_v<T>);
+  using alloc = std::allocator_traits<Allocator>;
+
   explicit queue(std::int32_t n = 32) { allocate_queue(n); };
   ~queue() noexcept { free_queue(); };
 
@@ -36,7 +39,7 @@ public:
   /**< @brief キューに要素xを挿入する */
   template <class... Args> void push(Args &&... args) {
     BOOST_ASSERT_MSG(!full(), "Queue overflow"); // オーバーフローチェック
-    alloc_.construct(&Q_[tail_],
+    alloc::construct(alloc_, &Q_[tail_],
                      std::forward<Args>(args)...); // コンストラクタ呼び出し
     tail_ = (tail_ + 1) % cap_;                    // 循環処理
   }
@@ -47,8 +50,8 @@ public:
       return std::nullopt;
     }
     decltype(auto) front = Q_[head_];
-    destroy(Q_[head_]);         // デストラクタ呼び出し
-    head_ = (head_ + 1) % cap_; // 循環処理
+    alloc::destroy(alloc_, &Q_[head_]); // デストラクタ呼び出し
+    head_ = (head_ + 1) % cap_;         // 循環処理
     return std::make_optional(front);
   }
 
@@ -65,10 +68,13 @@ private:
                          U>::value>::type * = nullptr>
   void destroy_queue() noexcept {
     if (head_ < tail_) {
-      std::for_each(Q_ + head_, Q_ + tail_, destroy<U>);
+      std::for_each(Q_ + head_, Q_ + tail_,
+                    [this](T &t) { alloc::destroy(alloc_, &t); });
     } else if (head_ > tail_) {
-      std::for_each(Q_, Q_ + tail_, destroy<U>);
-      std::for_each(Q_ + head_, Q_ + cap_, destroy<U>);
+      std::for_each(Q_, Q_ + tail_,
+                    [this](T &t) { alloc::destroy(alloc_, &t); });
+      std::for_each(Q_ + head_, Q_ + cap_,
+                    [this](T &t) { alloc::destroy(alloc_, &t); });
     }
   }
   template <class U, typename std::enable_if<std::is_trivially_destructible<
@@ -78,13 +84,13 @@ private:
   /**< @brief キューを解放する */
   void free_queue() noexcept {
     destroy_queue<T>();
-    alloc_.deallocate(Q_, cap_); /* 記憶領域の解放 */
+    alloc::deallocate(alloc_, Q_, cap_); /* 記憶領域の解放 */
     head_ = tail_ = cap_ = 0;
     Q_ = nullptr;
   }
   /**< @brief キューを確保する */
   void allocate_queue(std::size_t n) {
-    Q_ = alloc_.allocate(n);
+    Q_ = alloc::allocate(alloc_, n);
     cap_ = n + 1;
   }
 };

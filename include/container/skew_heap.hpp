@@ -34,6 +34,7 @@ template <class Key, class Compare = std::less<Key>,
 struct skew_heap {
 public:
   static_assert(std::is_nothrow_constructible_v<Key>);
+  using alloc = std::allocator_traits<Allocator>;
   using node = skew_heap_node<Key>;
 
   explicit skew_heap(std::size_t n = 32) { allocate_pool(n); }
@@ -90,14 +91,14 @@ private:
   template <class... Args> node *create_node(Args &&... args) {
     BOOST_ASSERT_MSG(!full(), "Skew heap capcity over.");
     node *x = pool_ + size_;
-    alloc_.construct(x, std::forward<Args>(args)...);
+    alloc::construct(alloc_, x, std::forward<Args>(args)...);
     size_++;
     return x;
   }
 
   /**< @brief 節点xの記憶領域の解放を行う */
   void destroy_node(node *x) noexcept {
-    alloc_.destroy(x);
+    alloc::destroy(alloc_, x);
     size_--;
   }
 
@@ -114,23 +115,23 @@ private:
   /**< @brief メモリプールの解放 */
   void free_pool() noexcept {
     postorder_destroy_nodes(root_);
-    alloc_.deallocate(pool_, cap_);
+    alloc::deallocate(alloc_, pool_, cap_);
     root_ = pool_ = nullptr;
     size_ = cap_ = 0;
   }
 
   /**< @brief メモリプールの確保 */
   void allocate_pool(std::size_t n) {
-    pool_ = alloc_.allocate(n);
+    pool_ = alloc::allocate(alloc_, n);
     cap_ = n;
   }
 
 private:
   node *root_ = nullptr; /**< 木の根   */
-  Compare cmp_;          /**< 比較述語 */
   std::size_t cap_ = 0;  /**< ねじれヒープのバッファサイズ */
   std::size_t size_ = 0; /**< ねじれヒープのサイズ */
   node *pool_ = nullptr; /**< メモリプールへのポインタ */
+  Compare cmp_;          /**< 比較述語 */
   Allocator alloc_;      /**< アロケータ */
 };
 

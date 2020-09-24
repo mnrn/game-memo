@@ -54,6 +54,7 @@ template <class Key, class T, class Compare = std::less<Key>,
 struct avl_tree {
   static_assert(std::is_nothrow_constructible_v<Key> &&
                 std::is_nothrow_constructible_v<T>);
+  using alloc = std::allocator_traits<Allocator>;
   using sides_t = std::int32_t;
   using pair_t = std::pair<const Key, T>;
   using node = avl_tree_node<Key, T>;
@@ -275,14 +276,14 @@ private:
   node *create_node(const Key &k, const T &v) {
     BOOST_ASSERT_MSG(size_ < cap_, "AVL tree capacity over.");
     node *x = pool_ + size_;
-    alloc_.construct(x, k, v);
+    alloc::construct(alloc_, x, k, v);
     size_++;
     return x;
   }
 
   /**< @brief 節点xの記憶領域の解放を行う */
   void destroy_node(node *x) noexcept {
-    container::destroy(x);
+    alloc::destroy(alloc_, x);
     size_--;
   }
 
@@ -299,14 +300,14 @@ private:
   /**< @brief メモリプールの解放 */
   void free_pool() noexcept {
     postorder_destroy_nodes(root_);
-    alloc_.deallocate(pool_, cap_);
+    alloc::deallocate(alloc_, pool_, cap_);
     root_ = pool_ = nullptr;
     size_ = cap_ = 0;
   }
 
   /**< @brief メモリプールの確保 */
   void allocate_pool(std::size_t n) {
-    pool_ = alloc_.allocate(n);
+    pool_ = alloc::allocate(alloc_, n);
     cap_ = n;
   }
 
@@ -320,10 +321,10 @@ private:
 
 private:
   node *root_ = nullptr; /**< AVL木の根 */
-  Compare cmp_;          /**< 比較述語  */
   std::size_t cap_ = 0;  /**< AVL木のバッファサイズ    */
   std::size_t size_ = 0; /**< AVL木のサイズ           */
   node *pool_ = nullptr; /**< AVL木の節点用メモリプール */
+  Compare cmp_;          /**< 比較述語  */
   Allocator alloc_;      /**< アロケータ */
 };
 

@@ -10,6 +10,7 @@
 #include <boost/container/pmr/polymorphic_allocator.hpp>
 #include <cassert>
 #include <cstddef>
+#include <memory>
 #include <optional>
 #include <type_traits>
 
@@ -24,6 +25,8 @@ template <class T,
 struct stack {
 public:
   static_assert(std::is_nothrow_constructible_v<T>);
+  using alloc = std::allocator_traits<Allocator>;
+
   explicit stack(std::size_t n = 32) { allocate_stack(n); }
   ~stack() noexcept { free_stack(); }
 
@@ -36,7 +39,7 @@ public:
   /**< @brief スタックにxを挿入する  */
   template <class... Args> void push(Args &&... args) {
     BOOST_ASSERT_MSG(!full(), "Stack overflow."); // オーバーフローチェック
-    alloc_.construct(&S_[top_++],
+    alloc::construct(alloc_, &S_[top_++],
                      std::forward<Args>(args)...); // コンストラクタ呼び出し
   }
 
@@ -46,7 +49,7 @@ public:
       return std::nullopt;
     }
     decltype(auto) top = S_[top_ - 1];
-    destroy(S_[--top_]); // デストラクタ呼び出し
+    alloc::destroy(alloc_, &S_[--top_]); // デストラクタ呼び出し
     return std::make_optional(top);
   }
 
@@ -57,14 +60,14 @@ private:
   T *S_ = nullptr;      /**< スタックS */
   std::size_t top_ = 0; /**< スタックトップ */
   std::size_t cap_ = 0; /**< スタックSのバッファサイズ */
-  Allocator alloc_;     /**<* アロケータ */
+  Allocator alloc_;     /**< アロケータ */
 
 private:
   /**< @brief スタックを破棄する */
   template <class U, typename std::enable_if<!std::is_trivially_destructible<
                          U>::value>::type * = nullptr>
   void destroy_stack() noexcept {
-    std::for_each(S_, S_ + top_, destroy<U>);
+    std::for_each(S_, S_ + top_, [this](T &t) { alloc::destroy(alloc_, &t); });
   }
   template <class U, typename std::enable_if<std::is_trivially_destructible<
                          U>::value>::type * = nullptr>
@@ -73,13 +76,13 @@ private:
   /**< @brief スタックを解放する */
   void free_stack() noexcept {
     destroy_stack<T>();
-    alloc_.deallocate(S_, cap_);
+    alloc::deallocate(alloc_, S_, cap_);
     top_ = cap_ = 0;
     S_ = nullptr;
   }
   /**< @brief スタックを確保する */
   void allocate_stack(std::size_t n) {
-    S_ = alloc_.allocate(n);
+    S_ = alloc::allocate(alloc_, n);
     cap_ = n;
   }
 };
