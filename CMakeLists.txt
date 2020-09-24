@@ -118,5 +118,6 @@ set(TEST_TARGETS
     queue
     skew_heap
     avl_tree
+    two_timers_parallel
 )
 testAll()
