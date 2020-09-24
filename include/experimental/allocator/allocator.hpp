@@ -5,7 +5,7 @@
 
 template <typename T> struct allocator {
 public:
-  using value_type = T; // 要素の型
+  using value_type = T;
 
   allocator() noexcept = default;
   ~allocator() noexcept = default;
