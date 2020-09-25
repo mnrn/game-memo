@@ -118,5 +118,10 @@ set(TEST_TARGETS
     skew_heap
     avl_tree
     two_timers_parallel
+    daytime_tcp_client
+    daytime_tcp_server
+    daytime_udp_client
+    daytime_udp_server
+    two_async_daytime_servers
 )
 testAll()
