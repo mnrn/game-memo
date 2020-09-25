@@ -28,6 +28,7 @@ cmake --build /path/to/build --parallel 10
 - header-only
   - [fmt]
   - [catch2]
+  - [spdlog]
 - header & lib
   - [boost]
   - [jemalloc]
@@ -98,7 +99,8 @@ cmake --build /path/to/build --parallel 10
 ```
 
 [boost]:<https://www.boost.org/>
-[catch2]:<https://github.com/catchorg/Catch2>
-[fmt]:<https://github.com/fmtlib/fmt>
 [boost-bcp]:<https://www.boost.org/doc/libs/tools/bcp/doc/html/index.html>
 [jemalloc]:<http://jemalloc.net/>
+[catch2]:<https://github.com/catchorg/Catch2>
+[fmt]:<https://github.com/fmtlib/fmt>
+[spdlog]:<https://github.com/gabime/spdlog>
