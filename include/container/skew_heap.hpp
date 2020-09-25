@@ -51,7 +51,7 @@ public:
     if (empty()) {
       return std::nullopt;
     }
-    decltype(auto) k = root_->key;
+    decltype(auto) k = std::move(root_->key);
     node *x = root_;
     root_ = merge(x->left, x->right);
     destroy_node(x);

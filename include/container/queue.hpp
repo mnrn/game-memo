@@ -49,7 +49,7 @@ public:
     if (empty()) { // アンダーフローチェック
       return std::nullopt;
     }
-    decltype(auto) front = Q_[head_];
+    decltype(auto) front = std::move(Q_[head_]);
     alloc::destroy(alloc_, &Q_[head_]); // デストラクタ呼び出し
     head_ = (head_ + 1) % cap_;         // 循環処理
     return std::make_optional(front);
