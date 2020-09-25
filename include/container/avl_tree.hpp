@@ -38,7 +38,7 @@ template <class Key, class T> struct avl_tree_node {
   Key key;    /**< キー    */
   T v;        /**< 付属データ */
 
-  constexpr avl_tree_node(const Key &k, const T &v) noexcept
+  constexpr explicit avl_tree_node(const Key &k, const T &v) noexcept
       : left(nullptr), right(nullptr), h(1), key(k), v(v) {}
 };
 
