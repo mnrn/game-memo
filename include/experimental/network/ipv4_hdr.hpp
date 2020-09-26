@@ -7,6 +7,7 @@
 #ifndef IPV4_HDR_HPP
 #define IPV4_HDR_HPP
 
+#include "experimental/network/utility.hpp"
 #include <array>
 #include <boost/asio/ip/address_v4.hpp>
 #include <istream>
@@ -106,7 +107,7 @@ public:
 
 private:
   constexpr std::uint16_t decode(int a, int b) const {
-    return (rep_[a] << 8) + rep_[b];
+    return net::decode(rep_[a], rep_[b]);
   }
   std::array<std::uint8_t, 60> rep_{};
 };

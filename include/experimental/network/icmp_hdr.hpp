@@ -7,6 +7,7 @@
 #ifndef ICMP_HDR_HPP
 #define ICMP_HDR_HPP
 
+#include "experimental/network/utility.hpp"
 #include <array>
 #include <istream>
 #include <ostream>
@@ -47,13 +48,15 @@ enum struct icmp_type : std::uint8_t {
 
 struct icmp_hdr {
 public:
-  constexpr std::uint8_t type() const { return rep_[0]; }
+  // constexpr std::uint8_t type() const { return rep_[0]; }
+  constexpr icmp_type type() const { return static_cast<icmp_type>(rep_[0]); }
   constexpr std::uint8_t code() const { return rep_[1]; }
   constexpr std::uint16_t checksum() const { return decode(2, 3); }
   constexpr std::uint16_t identifier() const { return decode(4, 5); }
   constexpr std::uint16_t sequence_number() const { return decode(6, 7); }
 
-  void type(std::uint8_t n) { rep_[0] = n; }
+  // void type(std::uint8_t n) { rep_[0] = n; }
+  void type(icmp_type n) { rep_[0] = static_cast<std::uint8_t>(n); }
   void code(std::uint8_t n) { rep_[1] = n; }
   void checksum(std::uint16_t n) { encode(2, 3, n); }
   void identifier(std::uint16_t n) { encode(4, 5, n); }
@@ -68,11 +71,10 @@ public:
 
 private:
   constexpr std::uint16_t decode(int a, int b) const {
-    return rep_[a] << 8 + rep_[b];
+    return net::decode(rep_[a], rep_[b]);
   }
   void encode(int a, int b, std::uint16_t n) {
-    rep_[a] = static_cast<std::uint8_t>(n >> 8);
-    rep_[b] = static_cast<std::uint8_t>(n & 0xff);
+    std::tie(rep_[a], rep_[b]) = net::encode(n);
   }
   std::array<std::uint8_t, 8> rep_{};
 };
