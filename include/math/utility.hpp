@@ -1,5 +1,5 @@
-#ifndef MATH_UTILS
-#define MATH_UTILS
+#ifndef MATH_UTILITY
+#define MATH_UTILITY
 
 #include <boost/math/constants/constants.hpp>
 #include <cmath>
@@ -7,6 +7,7 @@
 #include <type_traits>
 
 namespace math {
+namespace utility {
 
 /**
  * @brief 適切に2πの倍数を加えることで角度を[-π, π]の範囲にラップする
@@ -25,6 +26,7 @@ template <typename Float> constexpr inline Float wrap_pi(Float x) {
   return w;
 }
 
+} // namespace utility
 } // namespace math
 
 #endif
