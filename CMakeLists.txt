@@ -123,5 +123,7 @@ set(TEST_TARGETS
     daytime_udp_client
     daytime_udp_server
     two_async_daytime_servers
+    uint8x2_uint16
+    checksum
 )
 testAll()
