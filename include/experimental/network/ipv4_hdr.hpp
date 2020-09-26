@@ -51,7 +51,9 @@
 // https://www.boost.org/doc/html/boost_asio/example/cpp03/icmp/ipv4_header.hpp
 //
 
-struct ipv4_hdr {
+namespace net {
+namespace ip {
+struct hdr_v4 {
 public:
   /* The Version field indicates the format of the internet header. */
   constexpr std::uint8_t version() const { return (rep_[0] >> 4) & 0x0f; }
@@ -91,12 +93,12 @@ public:
         {rep_[16], rep_[17], rep_[18], rep_[19]}});
   }
 
-  friend std::istream &operator>>(std::istream &is, ipv4_hdr &hdr) {
+  friend std::istream &operator>>(std::istream &is, hdr_v4 &hdr) {
     is.read(reinterpret_cast<char *>(hdr.rep_.data()), 20);
     if (hdr.version() != 4) {
       is.setstate(std::ios::failbit);
     }
-    std::streamsize options_length = hdr.header_length() - 20;
+    const std::streamsize options_length = hdr.header_length() - 20;
     if (options_length < 0 || options_length > 40) {
       is.setstate(std::ios::failbit);
     } else {
@@ -111,5 +113,8 @@ private:
   }
   std::array<std::uint8_t, 60> rep_{};
 };
+
+} // namespace ip
+} // namespace net
 
 #endif

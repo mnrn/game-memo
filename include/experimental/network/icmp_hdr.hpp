@@ -32,7 +32,10 @@
 // https://www.boost.org/doc/html/boost_asio/example/cpp03/icmp/icmp_header.hpp
 //
 
-enum struct icmp_type : std::uint8_t {
+namespace net {
+namespace icmp {
+
+enum struct message_type : std::uint8_t {
   echo_reply = 0,
   destination_unreachable = 3,
   source_quench = 4,
@@ -46,26 +49,28 @@ enum struct icmp_type : std::uint8_t {
   information_reply = 16,
 };
 
-struct icmp_hdr {
+struct hdr {
 public:
   // constexpr std::uint8_t type() const { return rep_[0]; }
-  constexpr icmp_type type() const { return static_cast<icmp_type>(rep_[0]); }
+  constexpr message_type type() const {
+    return static_cast<message_type>(rep_[0]);
+  }
   constexpr std::uint8_t code() const { return rep_[1]; }
   constexpr std::uint16_t checksum() const { return decode(2, 3); }
   constexpr std::uint16_t identifier() const { return decode(4, 5); }
   constexpr std::uint16_t sequence_number() const { return decode(6, 7); }
 
   // void type(std::uint8_t n) { rep_[0] = n; }
-  void type(icmp_type n) { rep_[0] = static_cast<std::uint8_t>(n); }
+  void type(message_type n) { rep_[0] = static_cast<std::uint8_t>(n); }
   void code(std::uint8_t n) { rep_[1] = n; }
   void checksum(std::uint16_t n) { encode(2, 3, n); }
   void identifier(std::uint16_t n) { encode(4, 5, n); }
   void sequence_number(std::uint16_t n) { encode(6, 7, n); }
 
-  friend std::istream &operator>>(std::istream &is, icmp_hdr &hdr) {
+  friend std::istream &operator>>(std::istream &is, hdr &hdr) {
     return is.read(reinterpret_cast<char *>(hdr.rep_.data()), 8);
   }
-  friend std::ostream &operator<<(std::ostream &os, const icmp_hdr &hdr) {
+  friend std::ostream &operator<<(std::ostream &os, const hdr &hdr) {
     return os.write(reinterpret_cast<const char *>(hdr.rep_.data()), 8);
   }
 
@@ -78,5 +83,8 @@ private:
   }
   std::array<std::uint8_t, 8> rep_{};
 };
+
+} // namespace icmp
+} // namespace net
 
 #endif
