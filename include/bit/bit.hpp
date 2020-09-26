@@ -33,18 +33,21 @@ namespace bit {
  * @brief  符号なし整数vの先頭から続くゼロの数を数える
  * @note   IEEE 754形式をサポートしているアーキテクチャにのみ対応
  * @note   エンディアンはリトル、ビッグどちらにも対応
+ * @note   [Changing the active member of a union inside constexpr]
+ * (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p1330r0.pdf)
  * @param  std::uint32_t v 符号なし整数v
  * @return vの先頭から続くゼロの数
  */
-static constexpr inline std::int32_t nlz(std::uint32_t v) {
+static inline std::int32_t nlz(std::uint32_t v) {
   static_assert(
       std::numeric_limits<double>::is_iec559,
       "only support IEC 559 (IEEE 754) double precision floating point.");
-  union anonymous {
+  union {
     std::uint64_t asu64;
     double asf64;
-    constexpr explicit anonymous(double d) : asf64(d){};
-  } u((double)v + 0.5); // 0は例外表現なので0.5(=1.0 * 2^(-1))を加算しておく
+  } u;
+  u.asf64 =
+      (double)v + 0.5; // 0は例外表現なので0.5(=1.0 * 2^(-1))を加算しておく
   return 1054 - (u.asu64 >> 52); // 1054(=ゲタ(bias)の数+32-1) - vの指数部を返す
 }
 
