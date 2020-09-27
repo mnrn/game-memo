@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <iostream>
+#include <iterator>
 #include <tuple>
 
 namespace net {
@@ -32,9 +33,25 @@ static inline std::uint16_t checksum(std::uint16_t *addr, std::int32_t count) {
     sum += *reinterpret_cast<std::uint8_t *>(addr);
   }
   // Fold 32-bit sum to 16bits.
-  while (sum >> 16) {
-    sum = (sum & 0xffff) + (sum >> 16);
+  sum = (sum & 0xffff) + (sum >> 16);
+  sum += (sum >> 16);
+  return static_cast<std::uint16_t>(~sum);
+}
+
+template <typename ForwardIterator>
+constexpr std::uint16_t checksum(ForwardIterator begin, ForwardIterator end,
+                                 std::uint32_t init = 0) {
+  uint32_t sum = init;
+  ForwardIterator it = begin;
+  while (it != end) {
+    sum += static_cast<std::uint8_t>(*it++) << 8;
+    if (it != end) {
+      sum += static_cast<std::uint8_t>(*it++);
+    }
   }
+  // Fold 32-bit sum to 16bits.
+  sum = (sum & 0xffff) + (sum >> 16);
+  sum += (sum >> 16);
   return static_cast<std::uint16_t>(~sum);
 }
 
