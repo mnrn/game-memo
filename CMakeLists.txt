@@ -125,5 +125,6 @@ set(TEST_TARGETS
     two_async_daytime_servers
     uint8x2_uint16
     checksum
+    ping
 )
 testAll()
