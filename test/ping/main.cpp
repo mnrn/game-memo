@@ -6,8 +6,8 @@
 #include <istream>
 #include <ostream>
 
-#include "experimental/network/icmp_hdr.hpp"
-#include "experimental/network/ipv4_hdr.hpp"
+#include "network/icmp_hdr.hpp"
+#include "network/ipv4_hdr.hpp"
 
 class pinger {
 public:

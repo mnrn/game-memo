@@ -7,7 +7,7 @@
 #ifndef ICMP_HDR_HPP
 #define ICMP_HDR_HPP
 
-#include "experimental/network/utility.hpp"
+#include "network/utility.hpp"
 #include <array>
 #include <istream>
 #include <ostream>
