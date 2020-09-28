@@ -28,7 +28,10 @@ set(CMAKE_CXX_FLAGS_MINSIZEREL,     "${CMAKE_CXX_FLAGS_MINSIZEREL}      -DNDEBUG
 
 
 # Resolve dependency
+# Thread
 find_package(Threads REQUIRED)
+
+# Boost
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_LIBRARY_DIRS "${CMAKE_SOURCE_DIR}/lib/boost")
 find_package(Boost COMPONENTS container REQUIRED)
@@ -38,6 +41,8 @@ else()
     #message("@@ Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
     message("@@ Boost_LIBRARY_DIRS: ${Boost_LIBRARY_DIRS}")
 endif()
+
+# jemalloc
 set(JEMALLOC_HOME "${CMAKE_SOURCE_DIR}")
 find_package(jemalloc)
 if (NOT JEMALLOC_FOUND)
@@ -47,9 +52,21 @@ else()
     message("@@JEMALLOC_STATIC_LIB : ${JEMALLOC_STATIC_LIB}")
 endif()
 
+# OpenSSL
+if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+set(OPENSSL_ROOT_DIR "/usr/local/opt/openssl@1.1")
+endif()
+find_package(OpenSSL REQUIRED)
+if (NOT OPENSSL_FOUND)
+    message(FATAL_ERROR "Could not find OpenSSL!")
+else()
+    message("@@OPENSSL_INCLUDE_DIR : ${OPENSSL_INCLUDE_DIR}")
+    message("@@OPENSSL_LIBRARIES : ${OPENSSL_LIBRARIES}")
+    include_directories("${OPENSSL_INCLUDE_DIR}")
+endif()
+
 # Set preprocessor defines
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOMINMAX -D_USE_MATH_DEFINES")
-
 
 # Warning settings
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
@@ -61,10 +78,8 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wundef")
 endif()
 
-
 add_definitions(-std=c++20)
 file(GLOB SOURCE *.cpp src/*.cpp include/*.hpp)
-
 
 # Function for building
 function(build DIR_NAME TARGET_NAME)
@@ -81,6 +96,7 @@ function(build DIR_NAME TARGET_NAME)
     )
     target_link_libraries(${TARGET_NAME} 
         ${CMAKE_THREAD_LIBS_INIT}
+        ${OPENSSL_LIBRARIES}
         ${Boost_LIBRARIES}
         ${JEMALLOC_SHARED_LIB}
     )
@@ -126,5 +142,6 @@ set(TEST_TARGETS
     uint8x2_uint16
     checksum
     ping
+    ssl_server
 )
 testAll()
