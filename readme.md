@@ -32,8 +32,10 @@ cmake --build /path/to/build --parallel 10
 - header & lib
   - [boost]
   - [jemalloc]
+  - [OpenSSL]
 
 [boost] の依存関係の解決には必ず [boost-bcp] を用いて必要なものだけ third-party/boost に置いてください。
+[OpenSSL] はこちらのリポジトリに置いていません。
 
 ## Feature (TODO)
 
@@ -105,3 +107,4 @@ cmake --build /path/to/build --parallel 10
 [catch2]:<https://github.com/catchorg/Catch2>
 [fmt]:<https://github.com/fmtlib/fmt>
 [spdlog]:<https://github.com/gabime/spdlog>
+[OpenSSL]:<https://www.openssl.org/source/>
