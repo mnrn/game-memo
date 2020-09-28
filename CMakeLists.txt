@@ -54,7 +54,7 @@ endif()
 
 # OpenSSL
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-set(OPENSSL_ROOT_DIR "/usr/local/opt/openssl@1.1")
+    set(OPENSSL_ROOT_DIR "/usr/local/opt/openssl@1.1")
 endif()
 find_package(OpenSSL REQUIRED)
 if (NOT OPENSSL_FOUND)
