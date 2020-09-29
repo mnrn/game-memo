@@ -62,7 +62,7 @@ if (NOT OPENSSL_FOUND)
 else()
     message("@@OPENSSL_INCLUDE_DIR : ${OPENSSL_INCLUDE_DIR}")
     message("@@OPENSSL_LIBRARIES : ${OPENSSL_LIBRARIES}")
-    include_directories("${OPENSSL_INCLUDE_DIR}")
+    include_directories(SYSTEM "${OPENSSL_INCLUDE_DIR}")
 endif()
 
 # Set preprocessor defines
@@ -143,5 +143,6 @@ set(TEST_TARGETS
     checksum
     ping
     ssl_server
+    ssl_client
 )
 testAll()
