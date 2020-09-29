@@ -66,7 +66,7 @@ public:
   }
 
 private:
-  std::string get_password() const { return "test"; }
+  std::string get_password() const { return "test-example"; }
 
   void accept() {
     acceptor_.async_accept([this](const boost::system::error_code &err,
