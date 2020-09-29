@@ -58,15 +58,15 @@ public:
                          boost::asio::ssl::context::no_sslv2 |
                          boost::asio::ssl::context::single_dh_use);
     context_.set_password_callback(std::bind(&ssl_server::get_password, this));
-    context_.use_certificate_chain_file("server.pem");
-    context_.use_private_key_file("server.pem", boost::asio::ssl::context::pem);
+    context_.use_certificate_chain_file("server-crt.pem");
+    context_.use_private_key_file("server.key", boost::asio::ssl::context::pem);
     context_.use_tmp_dh_file("dh2048.pem");
 
     accept();
   }
 
 private:
-  std::string get_password() const { return "test-example"; }
+  std::string get_password() const { return "test"; }
 
   void accept() {
     acceptor_.async_accept([this](const boost::system::error_code &err,

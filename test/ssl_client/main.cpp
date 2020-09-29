@@ -111,11 +111,11 @@ int main(int argc, char *argv[]) {
     }
     boost::asio::io_context io_context;
     boost::asio::ip::tcp::resolver resolver(io_context);
-    auto enspoints = resolver.resolve(argv[1], argv[2]);
+    auto endpoints = resolver.resolve(argv[1], argv[2]);
 
     boost::asio::ssl::context ctx(boost::asio::ssl::context::sslv23);
-    ctx.load_verify_file("ca.pem");
-
+    ctx.load_verify_file("ca-crt.pem");
+    ssl_client c(io_context, ctx, endpoints);
     io_context.run();
   } catch (std::exception &e) {
     std::cerr << "Exception: " << e.what() << std::endl;
