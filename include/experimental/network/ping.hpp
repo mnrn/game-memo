@@ -60,7 +60,7 @@ private:
     if (num_replies_ == 0) {
       std::cout << "Request timed out" << std::endl;
     }
-    // Requests must be sent no less than one econd apart.
+    // Requests must be sent no less than one second apart.
     timer_.expires_at(time_sent_ + std::chrono::seconds(1));
     timer_.async_wait(boost::bind(&ping::start_send, this));
   }
