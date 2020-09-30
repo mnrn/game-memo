@@ -144,5 +144,6 @@ set(TEST_TARGETS
     ping
     ssl_server
     ssl_client
+    async_tcp_client_timeout
 )
 testAll()
