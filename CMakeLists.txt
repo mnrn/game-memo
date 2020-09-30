@@ -145,5 +145,6 @@ set(TEST_TARGETS
     ssl_server
     ssl_client
     async_tcp_client_timeout
+    read_write_asio
 )
 testAll()
