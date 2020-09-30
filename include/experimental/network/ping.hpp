@@ -64,6 +64,7 @@ private:
     timer_.expires_at(time_sent_ + std::chrono::seconds(1));
     timer_.async_wait(boost::bind(&ping::start_send, this));
   }
+
   void start_receive() {
     // Discard any data already in the buffer.
     reply_buffer_.consume(reply_buffer_.size());
@@ -73,6 +74,7 @@ private:
         reply_buffer_.prepare(65536),
         boost::bind(&ping::handle_receive, this, boost::placeholders::_2));
   }
+
   void handle_receive(std::size_t len) {
     // The actual number of bytes received is commited to the buffer so that we
     // can extract it using a std::istream object.
