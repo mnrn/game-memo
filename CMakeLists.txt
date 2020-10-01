@@ -148,5 +148,12 @@ set(TEST_TARGETS
     async_tcp_server_timeout
     read_write_asio
     async_operation_example_01
+    async_operation_example_02
+    async_operation_example_03
+    async_operation_example_04
+    async_operation_example_05
+    #async_operation_example_06
+    async_operation_example_07
+    async_operation_example_08
 )
 testAll()
