@@ -117,7 +117,7 @@ public:
   using tcp = boost::asio::ip::tcp;
   using error_code = boost::system::error_code;
 
-  tcp_session(tcp::socket &socket, channel &ch)
+  tcp_session(tcp::socket socket, channel &ch)
       : channel_(ch), socket_(std::move(socket)) {
     input_deadline_.expires_at(steady_timer::time_point::max());
     output_deadline_.expires_at(steady_timer::time_point::max());
@@ -333,6 +333,14 @@ int main(int argc, char *argv[]) {
                 << std::endl;
       return 1;
     }
+    boost::asio::io_context io_context;
+    boost::asio::ip::tcp::endpoint listen_endpoint(boost::asio::ip::tcp::v4(),
+                                                   std::atoi(argv[1]));
+    boost::asio::ip::udp::endpoint broadcast_endpoint(
+        boost::asio::ip::make_address(argv[2]), std::atoi(argv[3]));
+
+    server s(io_context, listen_endpoint, broadcast_endpoint);
+    io_context.run();
   } catch (std::exception &e) {
     std::cerr << "Exception: " << e.what() << std::endl;
   }

@@ -195,8 +195,9 @@ private:
     }
 
     // Start an asynchronous operation to send a heartbeat message.
+    std::string msg{"Hello, world!\n"};
     boost::asio::async_write(
-        socket_, boost::asio::buffer("\n", 1),
+        socket_, boost::asio::buffer(msg, msg.length()),
         std::bind(&client::handle_write, this, std::placeholders::_1));
   }
 
