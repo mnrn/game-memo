@@ -69,7 +69,7 @@
 // to message sending.
 //
 // FROM:
-// https://www.boost.org/doc/libs/1_74_0/doc/html/boost_asio/example/cpp11/timeouts/async_tcp_client.cpp
+// https://www.boost.org/doc/html/boost_asio/example/cpp11/timeouts/async_tcp_client.cpp
 //
 
 class client {
