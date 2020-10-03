@@ -37,7 +37,7 @@ cmake --build /path/to/build --parallel 10
 [boost] の依存関係の解決には必ず [boost-bcp] を用いて必要なものだけ third-party/boost に置いてください。
 [openssl] はこちらのリポジトリに置いていません。
 
-## Feature (TODO)
+## TODO
 
 - Allocator
 - Concurrency
