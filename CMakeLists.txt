@@ -157,5 +157,6 @@ set(TEST_TARGETS
     async_operation_example_08
     jemalloc_stats_print
     jemallctl
+    jemalloc_leak_checking
 )
 testAll()

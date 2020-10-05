@@ -2,3 +2,5 @@
 /build
 /data
 /ssl
+/scripts
+*.heap
