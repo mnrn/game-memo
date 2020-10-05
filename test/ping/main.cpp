@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
       return 1;
     }
     boost::asio::io_context io_context;
-    net::ping p(io_context, argv[1]);
+    net::pinger p(io_context, argv[1]);
     io_context.run();
   } catch (std::exception &e) {
     std::cerr << "Exception: " << e.what() << std::endl;

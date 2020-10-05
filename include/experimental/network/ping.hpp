@@ -14,9 +14,9 @@
 
 namespace net {
 
-class ping {
+class pinger {
 public:
-  explicit ping(boost::asio::io_context &io_context, const char *destination)
+  explicit pinger(boost::asio::io_context &io_context, const char *destination)
       : resolver_(io_context), socket_(io_context, boost::asio::ip::icmp::v4()),
         timer_(io_context), sequence_number_(0), num_replies_(0) {
     destination_ =
@@ -29,7 +29,7 @@ public:
 private:
   void start_send() {
     std::string body{
-        "0abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ1\n"};
+        "0abcdefghijklmnopqrstuvwxyz!ABCDEFGHIJKLMNOPQRSTUVWXYZ1?"};
 
     // Create an ICMP header for an echo request.
     net::icmp::hdr echo_req;
@@ -54,7 +54,7 @@ private:
     // Wait up to five seconds for a reply.
     num_replies_ = 0;
     timer_.expires_at(time_sent_ + std::chrono::seconds(5));
-    timer_.async_wait(boost::bind(&ping::handle_timeout, this));
+    timer_.async_wait(boost::bind(&pinger::handle_timeout, this));
   }
 
   void handle_timeout() {
@@ -63,7 +63,7 @@ private:
     }
     // Requests must be sent no less than one second apart.
     timer_.expires_at(time_sent_ + std::chrono::seconds(1));
-    timer_.async_wait(boost::bind(&ping::start_send, this));
+    timer_.async_wait(boost::bind(&pinger::start_send, this));
   }
 
   void start_receive() {
@@ -73,7 +73,7 @@ private:
     // Wait for a reply. We prepare the buffer to receive up to 64KB.
     socket_.async_receive(
         reply_buffer_.prepare(65536),
-        boost::bind(&ping::handle_receive, this, boost::placeholders::_2));
+        boost::bind(&pinger::handle_receive, this, boost::placeholders::_2));
   }
 
   void handle_receive(std::size_t len) {

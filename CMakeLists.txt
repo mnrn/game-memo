@@ -133,12 +133,6 @@ set(TEST_TARGETS
     queue
     skew_heap
     avl_tree
-    two_timers_parallel
-    daytime_tcp_client
-    daytime_tcp_server
-    daytime_udp_client
-    daytime_udp_server
-    two_async_daytime_servers
     uint8x2_uint16
     checksum
     ping
@@ -149,10 +143,7 @@ set(TEST_TARGETS
     read_write_asio
     async_operation_example_01
     async_operation_example_02
-    async_operation_example_03
-    async_operation_example_04
     async_operation_example_05
-    #async_operation_example_06
     async_operation_example_07
     async_operation_example_08
     jemalloc_stats
