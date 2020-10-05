@@ -28,7 +28,8 @@ public:
 
 private:
   void start_send() {
-    std::string body{"Hello! Start sending echo request."};
+    std::string body{
+        "0abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ1\n"};
 
     // Create an ICMP header for an echo request.
     net::icmp::hdr echo_req;
