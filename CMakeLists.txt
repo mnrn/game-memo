@@ -145,16 +145,13 @@ set(TEST_TARGETS
     uint8x2_uint16
     checksum
     ping
-    ssl_server
-    ssl_client
-    async_tcp_client_timeout
-    async_tcp_server_timeout
-    read_write_asio
-    async_operation_example_01
-    async_operation_example_02
-    async_operation_example_05
-    async_operation_example_07
-    async_operation_example_08
+    asio_ssl_server
+    asio_ssl_client
+    asio_tcp_client_timeout
+    asio_tcp_server_timeout
+    asio_read_write
+    asio_write_fsm
+    asio_write_coro
     jemalloc_stats_print
     jemallctl
     jemalloc_leak_checking
