@@ -155,6 +155,7 @@ set(TEST_TARGETS
     async_operation_example_05
     async_operation_example_07
     async_operation_example_08
-    jemalloc_stats
+    jemalloc_stats_print
+    jemallctl
 )
 testAll()
