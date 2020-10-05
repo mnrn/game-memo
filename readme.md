@@ -31,10 +31,11 @@ cmake --build /path/to/build --parallel 10
   - [spdlog]
 - header & lib
   - [boost]
+    - [openssl]
   - [jemalloc]
-  - [openssl]
+  - [libuv]
 
-[boost] の依存関係の解決には必ず [boost-bcp] を用いて必要なものだけ third-party/boost に置いてください。
+[boost] の依存関係の解決には必ず [boost-bcp] を用いて必要なものだけ third-party/boost に置いてください。  
 [openssl] はこちらのリポジトリに置いていません。
 
 ## TODO
@@ -108,3 +109,4 @@ cmake --build /path/to/build --parallel 10
 [fmt]:<https://github.com/fmtlib/fmt>
 [spdlog]:<https://github.com/gabime/spdlog>
 [openssl]:<https://www.openssl.org/source/>
+[libuv]:<https://github.com/libuv/libuv>

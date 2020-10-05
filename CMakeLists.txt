@@ -65,6 +65,15 @@ else()
     include_directories(SYSTEM "${OPENSSL_INCLUDE_DIR}")
 endif()
 
+# libuv
+find_package(LibUV REQUIRED)
+if (NOT LIBUV_FOUND)
+    message(FATAL_ERROR "Could not find libuv!")
+else()
+    message("@@LIBUV_INCLUDE_DIR : ${LIBUV_INCLUDE_DIR}")
+    message("@@LIBUV_LIBRARIES : ${LIBUV_LIBRARIES}")
+endif()
+
 # Set preprocessor defines
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOMINMAX -D_USE_MATH_DEFINES")
 
