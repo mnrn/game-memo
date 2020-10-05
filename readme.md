@@ -8,8 +8,8 @@
 例えば、デバッグビルドは以下のように行います。
 
 ```shell
-cmake -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_BUILD_TYPE:STRING=Debug -H/path/to/ -B/path/to/build -G "Unix Makefiles"
-cmake --build /path/to/build --parallel 10
+cmake -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_BUILD_TYPE:STRING=Debug -H/path/to/ -B/path/to/build -G "Ninja"
+cmake --build /path/to/build --parallel 13
 ```
 
 ビルドオプションはいまのところ、
