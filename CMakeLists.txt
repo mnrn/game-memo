@@ -152,5 +152,6 @@ set(TEST_TARGETS
     jemallctl
     jemalloc_leak_checking
     uv_ping_pong
+    uv_tcp_echo_server
 )
 testAll()
