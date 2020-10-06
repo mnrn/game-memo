@@ -29,7 +29,7 @@ struct pinger_t {
 };
 static_assert(std::is_pod_v<pinger_t>);
 
-static void close_loop(uv_loop_t *loop) {
+static inline void close_loop(uv_loop_t *loop) {
   uv_walk(
       loop,
       [](uv_handle_t *handle, void *) {
@@ -41,7 +41,7 @@ static void close_loop(uv_loop_t *loop) {
   uv_run(loop, UV_RUN_DEFAULT);
 }
 
-static bool can_ipv6() {
+static inline bool can_ipv6() {
   uv_interface_address_t *addr = nullptr;
   int count = 0;
   if (uv_interface_addresses(&addr, &count)) {
@@ -54,25 +54,6 @@ static bool can_ipv6() {
   }
   uv_free_interface_addresses(addr, count);
   return supported;
-}
-
-static void alloc_cb(uv_handle_t *, size_t size, uv_buf_t *buf) {
-  buf->base = static_cast<char *>(jemalloc(size));
-  buf->len = size;
-}
-
-static void pinger_on_close(uv_handle_t *handle) {
-  pinger_t *pinger = static_cast<pinger_t *>(handle->data);
-
-  BOOST_ASSERT(NUM_PINGS == pinger->pongs);
-
-  jefree(pinger);
-  completed_pingers++;
-}
-
-static void pinger_after_write(uv_write_t *req, int stat) {
-  BOOST_ASSERT(stat == 0);
-  jefree(req);
 }
 
 static void pinger_write_ping(pinger_t *pinger) {
@@ -92,7 +73,10 @@ static void pinger_write_ping(pinger_t *pinger) {
 
   uv_write_t *req = static_cast<uv_write_t *>(jemalloc(sizeof(uv_write_t)));
   if (uv_write(req, reinterpret_cast<uv_stream_t *>(&pinger->stream.tcp), bufs,
-               nbufs, pinger_after_write)) {
+               nbufs, [](uv_write_t *req, int stat) {
+                 BOOST_ASSERT(stat == 0);
+                 jefree(req);
+               })) {
     BOOST_ASSERT_MSG(false, "uv_write faileed");
   }
 
@@ -101,7 +85,16 @@ static void pinger_write_ping(pinger_t *pinger) {
 
 static void pinger_read_cb(uv_stream_t *stream, ssize_t nread,
                            const uv_buf_t *buf) {
+
   pinger_t *pinger = static_cast<pinger_t *>(stream->data);
+  auto pinger_on_close = [](uv_handle_t *handle) {
+    pinger_t *pinger = static_cast<pinger_t *>(handle->data);
+
+    BOOST_ASSERT(NUM_PINGS == pinger->pongs);
+
+    jefree(pinger);
+    completed_pingers++;
+  };
 
   if (nread < 0) {
     BOOST_ASSERT(nread == UV_EOF);
@@ -143,15 +136,20 @@ static void pinger_on_connect(uv_connect_t *req, int stat) {
 
   BOOST_ASSERT(stat == 0);
 
-  BOOST_ASSERT(1 == uv_is_readable(req->handle));
-  BOOST_ASSERT(1 == uv_is_writable(req->handle));
-  BOOST_ASSERT(0 ==
-               uv_is_closing(reinterpret_cast<uv_handle_t *>(req->handle)));
+  BOOST_ASSERT(uv_is_readable(req->handle) == 1);
+  BOOST_ASSERT(uv_is_writable(req->handle) == 1);
+  BOOST_ASSERT(uv_is_closing(reinterpret_cast<uv_handle_t *>(req->handle)) ==
+               0);
 
   pinger_write_ping(pinger);
 
-  uv_read_start(static_cast<uv_stream_t *>(req->handle), alloc_cb,
-                pinger_read_cb);
+  uv_read_start(
+      static_cast<uv_stream_t *>(req->handle),
+      [](uv_handle_t *, size_t size, uv_buf_t *buf) {
+        buf->base = static_cast<char *>(jemalloc(size));
+        buf->len = size;
+      },
+      pinger_read_cb);
 }
 
 // same ping-pong test, but using IPv6 connection.
