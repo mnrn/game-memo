@@ -2,11 +2,9 @@ cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 cmake_policy(VERSION 2.8)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
-
 # TODO: cmake_template -> your project name
 set(PROJECT_NAME memo)
 project(${PROJECT_NAME})
-
 
 # Include dirctories
 set(PROJECTS_DIR_NAME projects)
@@ -15,17 +13,14 @@ include_directories(SYSTEM third-party)
 include_directories(include)
 include_directories(src)
 
-
 # Select compiler
 set(CMAKE_CXX_COMPILER /usr/local/opt/llvm/bin/clang++ CACHE PATH "" FORCE) 
-
 
 # Compile mode
 set(CMAKE_CXX_FLAGS_DEBUG           "${CMAKE_CXX_FLAGS_DEBUG}           -DDEBUG  -g")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO, "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}           -g      -O3")
 set(CMAKE_CXX_FLAGS_RELEASE,        "${CMAKE_CXX_FLAGS_RELEASE}         -DNDEBUG         -O4 -flto ")
 set(CMAKE_CXX_FLAGS_MINSIZEREL,     "${CMAKE_CXX_FLAGS_MINSIZEREL}      -DNDEBUG         -Oz")
-
 
 # Resolve dependency
 # Thread
@@ -108,6 +103,7 @@ function(build DIR_NAME TARGET_NAME)
         ${OPENSSL_LIBRARIES}
         ${Boost_LIBRARIES}
         ${JEMALLOC_SHARED_LIB}
+        ${LIBUV_LIBRARIES}
     )
 endfunction(build)
 
@@ -155,5 +151,6 @@ set(TEST_TARGETS
     jemalloc_stats_print
     jemallctl
     jemalloc_leak_checking
+    uv_ping_pong
 )
 testAll()
