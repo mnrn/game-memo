@@ -163,6 +163,9 @@ static void tcp_pinger_v6_new(int vectored_writes) {
   pinger->state = 0;
   pinger->pongs = 0;
 
+  pinger_on_connect_count = 0;
+  completed_pingers = 0;
+
   // Try to connect to the server and do NUM_PINGS ping-pong;
   int r = uv_tcp_init(uv_default_loop(), &pinger->stream.tcp);
   pinger->stream.tcp.data = pinger;
@@ -189,6 +192,9 @@ static void tcp_pinger_new(int vectored_writes) {
   pinger->state = 0;
   pinger->pongs = 0;
 
+  pinger_on_connect_count = 0;
+  completed_pingers = 0;
+
   // Try to connect to the server and do NUM_PINGS ping-pong;
   int r = uv_tcp_init(uv_default_loop(), &pinger->stream.tcp);
   pinger->stream.tcp.data = pinger;
@@ -205,7 +211,37 @@ static void tcp_pinger_new(int vectored_writes) {
                    "Synchronous connect callbacks are not allowed.");
 }
 
-int main() {
-  tcp_pinger_new(0);
-  return uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+#define CATCH_CONFIG_MAIN
+#include <catch2/catch.hpp>
+
+TEST_CASE("tcp-ping-pong") {
+  SECTION("tcp-ping-pong") {
+    tcp_pinger_new(0);
+    REQUIRE(uv_run(uv_default_loop(), UV_RUN_DEFAULT) == 0);
+    close_loop(uv_default_loop());
+    REQUIRE(uv_loop_close(uv_default_loop()) == 0);
+  }
+  SECTION("tcp-ping-pong-vec") {
+    tcp_pinger_new(1);
+    REQUIRE(uv_run(uv_default_loop(), UV_RUN_DEFAULT) == 0);
+    close_loop(uv_default_loop());
+    REQUIRE(uv_loop_close(uv_default_loop()) == 0);
+  }
+  SECTION("ipv6") {
+    REQUIRE(can_ipv6());
+    /*
+    SECTION("tcp6-ping-pong") {
+      tcp_pinger_v6_new(0);
+      REQUIRE(uv_run(uv_default_loop(), UV_RUN_DEFAULT) == 0);
+      close_loop(uv_default_loop());
+      REQUIRE(uv_loop_close(uv_default_loop()) == 0);
+    }
+    SECTION("tcp6-ping-pong-vec") {
+      tcp_pinger_v6_new(1);
+      REQUIRE(uv_run(uv_default_loop(), UV_RUN_DEFAULT) == 0);
+      close_loop(uv_default_loop());
+      REQUIRE(uv_loop_close(uv_default_loop()) == 0);
+    }
+    */
+  }
 }
