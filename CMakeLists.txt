@@ -144,7 +144,7 @@ set(TEST_TARGETS
     avl_tree
     uint8x2_uint16
     checksum
-    ping
+    asio_ping
     asio_ssl_server
     asio_ssl_client
     asio_tcp_client_timeout
