@@ -46,7 +46,7 @@ public:
 private:
   tcp::socket &socket_;
   state state_ = state::reading;
-  std::array<char, 128> data_;
+  std::array<std::byte, 128> data_;
   boost::asio::const_buffer write_buffer_;
 };
 

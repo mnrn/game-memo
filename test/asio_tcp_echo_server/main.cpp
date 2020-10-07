@@ -31,7 +31,7 @@ private:
                              });
   }
   tcp::socket sock_;
-  std::array<char, 1024> data_;
+  std::array<std::byte, 1024> data_;
 };
 
 class server {
