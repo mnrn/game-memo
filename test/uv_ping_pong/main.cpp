@@ -17,7 +17,7 @@ static constexpr int TEST_PORT = 1234;
 static int pinger_on_connect_count = 0;
 static int completed_pingers = 0;
 
-struct pinger_t {
+typedef struct pinger_s {
   int vectored_writes;
   int pongs;
   int state;
@@ -27,7 +27,7 @@ struct pinger_t {
   } stream;
   uv_connect_t con_req;
   char read_buf[BUFSIZE];
-};
+} pinger_t;
 static_assert(std::is_pod_v<pinger_t>);
 
 static inline void close_loop(uv_loop_t *loop) {
