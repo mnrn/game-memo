@@ -69,6 +69,16 @@ else()
     message("@@LIBUV_LIBRARIES : ${LIBUV_LIBRARIES}")
 endif()
 
+# libcurl
+find_package(CURL REQUIRED)
+if (NOT CURL_FOUND)
+    message(FATAL ERROR "Could not find curl!")
+else()
+    message("@@CURL_VERSION_STRING : ${CURL_VERSION_STRING}")
+    message("@@CURL_INCLUDE_DIRS : ${CURL_INCLUDE_DIRS}")
+    message("@@CURL_LIBRARIES: ${CURL_LIBRARIES}")
+endif()
+
 # Set preprocessor defines
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOMINMAX -D_USE_MATH_DEFINES")
 
@@ -104,6 +114,7 @@ function(build DIR_NAME TARGET_NAME)
         ${Boost_LIBRARIES}
         ${JEMALLOC_SHARED_LIB}
         ${LIBUV_LIBRARIES}
+        ${CURL_LIBRARIES}
     )
 endfunction(build)
 
@@ -148,10 +159,12 @@ set(TEST_TARGETS
     asio_read_write
     asio_write_fsm
     asio_write_coro
+    asio_tcp_echo_server
     jemalloc_stats_print
     jemallctl
     jemalloc_leak_checking
     uv_ping_pong
     uv_tcp_echo_server
+    uv_wget
 )
 testAll()

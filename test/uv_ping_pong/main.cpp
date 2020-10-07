@@ -1,7 +1,6 @@
 #include <jemalloc/jemalloc.h>
 #include <uv.h>
 
-#include "experimental/network/utility.hpp"
 #include <boost/assert.hpp>
 #include <iostream>
 #include <string>
@@ -40,6 +39,21 @@ static inline void close_loop(uv_loop_t *loop) {
       },
       nullptr);
   uv_run(loop, UV_RUN_DEFAULT);
+}
+
+static inline bool can_ipv6() {
+  uv_interface_address_t *addr = nullptr;
+  int count = 0;
+  if (uv_interface_addresses(&addr, &count)) {
+    return false;
+  }
+
+  bool supported = false;
+  for (int i = 0; supported == false && i < count; i++) {
+    supported = (addr[i].address.address6.sin6_family == AF_INET6);
+  }
+  uv_free_interface_addresses(addr, count);
+  return supported;
 }
 
 static void pinger_write_ping(pinger_t *pinger) {
@@ -214,7 +228,7 @@ TEST_CASE("tcp-ping-pong") {
     REQUIRE(uv_loop_close(uv_default_loop()) == 0);
   }
   SECTION("ipv6") {
-    REQUIRE(net::can_ipv6());
+    REQUIRE(can_ipv6());
     SECTION("tcp6-ping-pong") {
       tcp_pinger_v6_new(0);
       REQUIRE(uv_run(uv_default_loop(), UV_RUN_DEFAULT) == 0);
