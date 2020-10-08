@@ -43,9 +43,9 @@ cmake --build /path/to/build --parallel 13
 ## TODO
 
 - Networking (WIP)
-- Synchoronous
+- Synchronization
 - CI (expect Travis CI)
-- Support Windows(DirectX12?)
+- Support Windows (DirectX12?)
 
 ## Directory tree
 
