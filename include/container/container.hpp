@@ -15,14 +15,14 @@ namespace container {
  * @brief construct helper using placement new.
  */
 template <typename T, typename... Args>
-constexpr T *construct(T *p, Args &&... args) {
+constexpr inline T *construct(T *p, Args &&... args) {
   return ::new (const_cast<void *>(static_cast<const volatile void *>(p)))
       T(std::forward<Args>(args)...);
 }
 /**
  * @brief destroy helper to invoke destructor explicitly.
  */
-template <typename T> constexpr void destroy(T *p) noexcept {
+template <typename T> constexpr inline void destroy(T *p) noexcept {
   if constexpr (!std::is_trivially_destructible_v<T>) {
     std::destroy_at(p);
   } else {
