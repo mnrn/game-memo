@@ -40,9 +40,8 @@ cmake --build /path/to/build --parallel 13
 
 ## TODO
 
-- Allocator (WIP)
-- Concurrency
 - Networking (WIP)
+- Concurrency
 - CI (expect Travis CI)
 
 ## Directory tree
