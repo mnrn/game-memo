@@ -29,8 +29,8 @@ template <class Key, class T> struct avl_tree_node {
   using height_t = std::int32_t;
   union {
     struct {
-      avl_tree_node *left;  /**< 左の子    */
-      avl_tree_node *right; /**< 右の子    */
+      avl_tree_node *l; /**< 左の子    */
+      avl_tree_node *r; /**< 右の子    */
     };
     avl_tree_node *c[2]; /**< 左右の子(0:左, 1:右) */
   };
@@ -39,7 +39,7 @@ template <class Key, class T> struct avl_tree_node {
   T v;        /**< 付属データ */
 
   constexpr explicit avl_tree_node(const Key &k, const T &v) noexcept
-      : left(nullptr), right(nullptr), h(1), key(k), v(v) {}
+      : l(nullptr), r(nullptr), h(1), key(k), v(v) {}
 };
 
 /**
@@ -119,9 +119,9 @@ private:
     if (x == nullptr) {
       return;
     } // xがNILを指すとき、再帰は底をつく
-    inorder(x->left, fn);
+    inorder(x->l, fn);
     fn(x->key, x->v);
-    inorder(x->right,
+    inorder(x->r,
             fn); // xの左右の子を根とする部分木に対して中間順木巡回を行う
   }
 
@@ -135,7 +135,7 @@ private:
     if (x == nullptr || eq(x->key, k)) {
       return x;
     } else {
-      return find(cmp_(k, x->key) ? x->left : x->right, k);
+      return find(cmp_(k, x->key) ? x->l : x->r, k);
     }
   }
 
@@ -149,9 +149,9 @@ private:
       return create_node(k, v);
     }                      // xがNILを指すとき、再帰は底をつく
     if (cmp_(k, x->key)) { // xの適切な子に再帰し、
-      x->left = insert(x->left, k, v, opt);
+      x->l = insert(x->l, k, v, opt);
     } else if (cmp_(x->key, k)) {
-      x->right = insert(x->right, k, v, opt);
+      x->r = insert(x->r, k, v, opt);
     } else {
       opt = x->v;
       x->v = v;
@@ -170,25 +170,25 @@ private:
       return nullptr;
     } // キーkはAVL木Tに存在しなかった
     if (cmp_(k, x->key)) {
-      x->left = erase(x->left, k, opt);
+      x->l = erase(x->l, k, opt);
       return balance(x);
     } // xの適切な子に再帰し、
     if (cmp_(x->key, k)) {
-      x->right = erase(x->right, k, opt);
+      x->r = erase(x->r, k, opt);
       return balance(x);
     } // xを根とする部分木を高さ平衡にする
     opt = x->v;
-    node *y = x->left,
-         *z = x->right; // x.key == kのとき、yをxの左の子、zをxの右の子とし、
+    node *y = x->l,
+         *z = x->r; // x.key == kのとき、yをxの左の子、zをxの右の子とし、
     destroy_node(x); // xを解放する
     if (z == nullptr) {
       return y;
     } // zがNILを指しているならば、新たな部分木の根としてyを返す
     node *w = leftmost(
         z); // zがNILを指していないならば、wをzを根とする部分木の中で最も左の子とする
-    w->right = erase__(
+    w->r = erase__(
         z); // zに対して再帰する.そして、wの右の子に新たな部分木を受け取る
-    w->left = y;       // yをwの左の子にする
+    w->l = y;          // yをwの左の子にする
     return balance(w); // wを根とする部分木を高さ平衡にして戻る
   }
 
@@ -202,21 +202,21 @@ private:
    */
   static node *balance(node *x) {
     x->h = reheight(x); // xの高さを更新する
-    if (bias(x) > 1) {  // 左に2つ分偏っている場合、left-left
-                        // caseおよびleft-right caseが考えられる
-      if (bias(x->left) < 0) {
-        x->left = left_rotate(x->left);
-      } // left-right caseならば、左回転を行うことで、left-left caseに帰着させる
-      return right_rotate(x); // 右回転を行うことでleft-left
+    if (bias(x) > 1) {  // 左に2つ分偏っている場合、left-l
+                        // caseおよびleft-r caseが考えられる
+      if (bias(x->l) < 0) {
+        x->l = left_rotate(x->l);
+      } // l-r caseならば、左回転を行うことで、left-l caseに帰着させる
+      return right_rotate(x); // 右回転を行うことでleft-l
                               // caseを解消し、高さ平衡を満たす部分木の根を返す
     }
-    if (bias(x) < -1) { // 右に2つ分偏っている場合、right-right
-                        // caseおよびright-left caseが考えられる
-      if (bias(x->right) > 0) {
-        x->right = right_rotate(x->right);
-      } // right-left caseならば、右回転を行うことで、right-right
+    if (bias(x) < -1) { // 右に2つ分偏っている場合、right-r
+                        // caseおよびright-l caseが考えられる
+      if (bias(x->r) > 0) {
+        x->r = right_rotate(x->r);
+      } // r-l caseならば、右回転を行うことで、right-r
         // caseに帰着させる
-      return left_rotate(x); // 左回転を行うことでright-right
+      return left_rotate(x); // 左回転を行うことでright-r
                              // caseを解消し、高さ平衡を満たす部分木の根を返す
     }
     return x; // 高さ平衡の場合、xを返す
@@ -245,17 +245,17 @@ private:
    * @brief 節点xを根とする部分木の中から最も左にある子を取得する
    * @param node*x 節点x
    */
-  static node *leftmost(node *x) { return x->left ? leftmost(x->left) : x; }
+  static node *leftmost(node *x) { return x->l ? leftmost(x->l) : x; }
 
   /**
    * @brief xを根とする部分木の最も左の子を削除する補助関数
    * @param node*x 節点x
    */
   static node *erase__(node *x) {
-    if (x->left == nullptr) {
-      return x->right;
+    if (x->l == nullptr) {
+      return x->r;
     }
-    x->left = erase__(x->left);
+    x->l = erase__(x->l);
     return balance(x);
   }
 
@@ -264,11 +264,11 @@ private:
   static constexpr height_t height(node *x) noexcept { return x ? x->h : 0; }
   /**< @brief 節点xの更新される高さを返す */
   static constexpr height_t reheight(node *x) noexcept {
-    return std::max(height(x->left), height(x->right)) + 1;
+    return std::max(height(x->l), height(x->r)) + 1;
   }
-  /**< @brief 節点xの左右の子の高さの差(x.left - x.right)を返す */
+  /**< @brief 節点xの左右の子の高さの差(x.l - x.r)を返す */
   static constexpr height_t bias(node *x) noexcept {
-    return height(x->left) - height(x->right);
+    return height(x->l) - height(x->r);
   }
 
 private:
@@ -292,8 +292,8 @@ private:
     if (x == nullptr) {
       return;
     }
-    postorder_destroy_nodes(x->left);
-    postorder_destroy_nodes(x->right);
+    postorder_destroy_nodes(x->l);
+    postorder_destroy_nodes(x->r);
     destroy_node(x);
   }
 

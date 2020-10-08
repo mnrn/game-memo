@@ -15,9 +15,9 @@
 namespace container {
 
 template <class Key> struct skew_heap_node {
-  skew_heap_node *left = nullptr;  /**< 左の子 */
-  skew_heap_node *right = nullptr; /**< 右の子 */
-  Key key;                         /**< キー */
+  skew_heap_node *l = nullptr; /**< 左の子 */
+  skew_heap_node *r = nullptr; /**< 右の子 */
+  Key key;                     /**< キー */
   template <class... Args>
   constexpr explicit skew_heap_node(Args &&... args) noexcept
       : key(std::forward<Args>(args)...) {}
@@ -53,7 +53,7 @@ public:
     }
     decltype(auto) k = std::move(root_->key);
     node *x = root_;
-    root_ = merge(x->left, x->right);
+    root_ = merge(x->l, x->r);
     destroy_node(x);
     return std::make_optional(k);
   }
@@ -82,9 +82,9 @@ private:
     if (!cmp_(x->key, y->key)) {
       std::swap(x, y);
     } // x.key > y.keyならば、x.key < y.keyになるよう交換
-    x->right = merge(x->right, y); // xの右の子とyをマージし、
-    std::swap(x->left, x->right); // xの左の子と右の子を交換する(leftist)
-    return x;                     // 新しい部分木の根xを返す
+    x->r = merge(x->r, y); // xの右の子とyをマージし、
+    std::swap(x->l, x->r); // xの左の子と右の子を交換する(leftist)
+    return x;              // 新しい部分木の根xを返す
   }
 
   /**< @brief 節点xの記憶領域の確保を行う */
@@ -107,8 +107,8 @@ private:
     if (x == nullptr) {
       return;
     }
-    postorder_destroy_nodes(x->left);
-    postorder_destroy_nodes(x->right);
+    postorder_destroy_nodes(x->l);
+    postorder_destroy_nodes(x->r);
     destroy_node(x);
   }
 
