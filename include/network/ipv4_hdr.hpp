@@ -56,34 +56,32 @@ namespace ip {
 struct hdr_v4 {
 public:
   /* The Version field indicates the format of the internet header. */
-  constexpr std::uint8_t version() const { return (rep_[0] >> 4) & 0x0f; }
+  std::uint8_t version() const { return (rep_[0] >> 4) & 0x0f; }
   /* The length of the internet header in 32 bit words. */
-  constexpr std::uint8_t ihl() const { return (rep_[0] & 0x0f); }
-  constexpr std::uint32_t header_length() const { return ihl() * 4; }
+  std::uint8_t ihl() const { return (rep_[0] & 0x0f); }
+  std::uint32_t header_length() const { return ihl() * 4; }
   /* The Type of Service provides an indication of the abstract parameters of
    * the quality of service desired. */
-  constexpr std::uint8_t type_of_service() const { return rep_[1]; }
+  std::uint8_t type_of_service() const { return rep_[1]; }
   /* The length of datagram. */
-  constexpr std::uint16_t total_length() const { return decode(2, 3); }
+  std::uint16_t total_length() const { return decode(2, 3); }
   /* An identifying value assigned by the sender to aid in assembling the
    * fragments of a datagram. */
-  constexpr std::uint16_t identification() const { return decode(4, 5); }
+  std::uint16_t identification() const { return decode(4, 5); }
   /* true = Dont' Fragment. false = May Fragment. */
-  constexpr bool dont_fragment() const { return (rep_[6] & 0x40) != 0; }
+  bool dont_fragment() const { return (rep_[6] & 0x40) != 0; }
   /* true = More Fragment, false = Last Fragment. */
-  constexpr bool more_fragments() const { return (rep_[6] & 0x20) != 0; }
+  bool more_fragments() const { return (rep_[6] & 0x20) != 0; }
   /* Where in the datagram this fragment belongs. */
-  constexpr std::uint16_t fragment_offset() const {
-    return decode(6, 7) & 0x1fff;
-  }
+  std::uint16_t fragment_offset() const { return decode(6, 7) & 0x1fff; }
   /* The maximum time the datagram is allowed to remain in he internet system.
    */
-  constexpr std::uint32_t time_to_live() const { return rep_[8]; }
+  std::uint32_t time_to_live() const { return rep_[8]; }
   /* The next level protocol used in the data portion of the internet datagram.
    */
-  constexpr std::uint8_t protocol() const { return rep_[9]; }
+  std::uint8_t protocol() const { return rep_[9]; }
   /* A checksum on the header only.  */
-  constexpr std::uint16_t header_checksum() const { return decode(10, 11); }
+  std::uint16_t header_checksum() const { return decode(10, 11); }
   boost::asio::ip::address_v4 source_address() const {
     return boost::asio::ip::address_v4(boost::asio::ip::address_v4::bytes_type{
         {rep_[12], rep_[13], rep_[14], rep_[15]}});
@@ -108,7 +106,7 @@ public:
   }
 
 private:
-  constexpr std::uint16_t decode(int a, int b) const {
+  std::uint16_t decode(int a, int b) const {
     return net::decode(rep_[a], rep_[b]);
   }
   std::array<std::uint8_t, 60> rep_{};

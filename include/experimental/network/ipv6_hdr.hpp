@@ -41,27 +41,25 @@ namespace ip {
 struct hdr_v6 {
 public:
   /* The Version field indicates the format of the internet header. */
-  constexpr std::uint8_t version() const { return (rep_[0] >> 4) & 0x0f; }
+  std::uint8_t version() const { return (rep_[0] >> 4) & 0x0f; }
   /* The value of the Traffic Class bits in a received packet or fragment might
    * be different from the value sent by the packet’s source. */
-  constexpr std::uint8_t traffic_class() const {
+  std::uint8_t traffic_class() const {
     return (rep_[0] & 0x0f) << 4 | ((rep_[1] >> 4) & 0x0f);
   }
   /* The 20-bit Flow Label field in the IPv6 header is used by a source to label
    * sequences of packets to be treated in the network as a single flow. */
-  constexpr std::uint32_t flow_label() const {
+  std::uint32_t flow_label() const {
     return ((rep_[1] & 0x0f) << 16 | rep_[2] << 8 | rep_[3]) & 0x000fffff;
   }
   /* Length of the IPv6 payload */
-  constexpr std::uint16_t payload_length() const {
-    return decode(rep_[4], rep_[5]);
-  }
+  std::uint16_t payload_length() const { return decode(rep_[4], rep_[5]); }
   /* Identifies the type of header immediately following the IPv6 header. Uses
    * the same values as the IPv4 Protocol field */
-  constexpr std::uint8_t next_header() const { return rep_[6]; }
+  std::uint8_t next_header() const { return rep_[6]; }
   /* When forwarding, the packet is discarded if Hop Limit was zero when
   received or is decremented to zero. */
-  constexpr std::uint8_t hop_limit() const { return rep_[7]; }
+  std::uint8_t hop_limit() const { return rep_[7]; }
   boost::asio::ip::address_v6 source_address() const {
     return boost::asio::ip::make_address_v6(
         boost::asio::ip::address_v6::bytes_type(
@@ -78,7 +76,7 @@ public:
   }
 
 private:
-  constexpr std::uint16_t decode(int a, int b) const {
+  std::uint16_t decode(int a, int b) const {
     return net::decode(rep_[a], rep_[b]);
   }
   std::array<std::uint8_t, 40> rep_{};

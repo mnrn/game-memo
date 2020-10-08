@@ -51,14 +51,12 @@ enum struct message_type : std::uint8_t {
 
 struct hdr {
 public:
-  // constexpr std::uint8_t type() const { return rep_[0]; }
-  constexpr message_type type() const {
-    return static_cast<message_type>(rep_[0]);
-  }
-  constexpr std::uint8_t code() const { return rep_[1]; }
-  constexpr std::uint16_t checksum() const { return decode(2, 3); }
-  constexpr std::uint16_t identifier() const { return decode(4, 5); }
-  constexpr std::uint16_t sequence_number() const { return decode(6, 7); }
+  // std::uint8_t type() const { return rep_[0]; }
+  message_type type() const { return static_cast<message_type>(rep_[0]); }
+  std::uint8_t code() const { return rep_[1]; }
+  std::uint16_t checksum() const { return decode(2, 3); }
+  std::uint16_t identifier() const { return decode(4, 5); }
+  std::uint16_t sequence_number() const { return decode(6, 7); }
 
   // void type(std::uint8_t n) { rep_[0] = n; }
   void type(message_type n) { rep_[0] = static_cast<std::uint8_t>(n); }
@@ -75,7 +73,7 @@ public:
   }
 
 private:
-  constexpr std::uint16_t decode(int a, int b) const {
+  std::uint16_t decode(int a, int b) const {
     return net::decode(rep_[a], rep_[b]);
   }
   void encode(int a, int b, std::uint16_t n) {
