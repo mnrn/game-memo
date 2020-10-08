@@ -1,7 +1,7 @@
 # ゲームメモ
 
 ゲームで役立つ知識のコードをメモしています。  
-実装は C++ ですが、他の言語でもすぐ応用できるようなものが多いです。
+実装は C++ ですが、他の言語でもすぐ応用できるようなものが多いです。  
 
 ## Build
 
@@ -31,9 +31,11 @@ cmake --build /path/to/build --parallel 13
   - [spdlog]
 - header & lib
   - [boost]
-    - [openssl]
   - [jemalloc]
+  - [openssl]
   - [libuv]
+
+ライブラリの選定も兼ねて行っているため、増えていくとは思います。
 
 [boost] の依存関係の解決には必ず [boost-bcp] を用いて必要なものだけ third-party/boost に置いてください。  
 [openssl] はこちらのリポジトリに置いていません。
@@ -41,9 +43,9 @@ cmake --build /path/to/build --parallel 13
 ## TODO
 
 - Networking (WIP)
-- Concurrency
+- Synchoronous
 - CI (expect Travis CI)
-- Support Windows
+- Support Windows(DirectX12?)
 
 ## Directory tree
 
