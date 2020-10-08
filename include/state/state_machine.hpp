@@ -23,12 +23,12 @@
 
 /**
  * @brief shared_ptr に this ポインタを渡すときは、enable_shared_from_this
- * を継承してください。
+ * を継承してshared_from_this()を呼び出してください。
  */
 template <typename T> struct state_machine : private boost::noncopyable {
 public:
   state_machine(std::shared_ptr<T> owner, const state<T> &init)
-      : owner_(owner), current_(init) {}
+      : owner_(std::move(owner)), current_(init) {}
 
   void change_state(const state<T> &next) {
     previous_ = current_;

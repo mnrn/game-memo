@@ -43,6 +43,7 @@ cmake --build /path/to/build --parallel 13
 - Networking (WIP)
 - Concurrency
 - CI (expect Travis CI)
+- Support Windows
 
 ## Directory tree
 
