@@ -21,7 +21,7 @@ cmake --build /path/to/build --parallel 13
 
 の4つになります。
 
-今の所、MS には対応していませんが、そのうち対応させようかと考えています。
+今の所、Windows には対応していませんが、そのうち対応させます。
 
 ## Dependency
 
@@ -31,15 +31,6 @@ cmake --build /path/to/build --parallel 13
   - [spdlog]
 - header & lib
   - [boost]
-    - asio.hpp
-    - beast.hpp
-    - noncopyable.hpp
-    - assert.hpp
-    - container
-      - pmr/polymorphic_allocator.hpp
-    - math
-      - constants/constants.hpp
-    - process.hpp
   - [jemalloc]
   - [openssl]
   - [libuv]
@@ -48,6 +39,24 @@ cmake --build /path/to/build --parallel 13
 
 [boost] の依存関係の解決には必ず [boost-bcp] を用いて必要なものだけ third-party/boost に置いてください。  
 [openssl] はこちらのリポジトリに置いていません。
+
+## Boost
+
+なるべく依存を少なくしようと考えています。  
+STLのライブラリでまだ不安定なものが入ることが多いです。
+
+- boost
+  - asio.hpp
+  - beast.hpp
+  - noncopyable.hpp
+  - assert.hpp
+  - container
+    - pmr/polymorphic_allocator.hpp
+  - math
+    - constants/constants.hpp
+  - process.hpp
+
+現在は上のヘッダに対して [boost-bcp] を実行したものを third-party に置いています。
 
 ## TODO
 
