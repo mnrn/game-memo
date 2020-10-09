@@ -7,9 +7,13 @@ jobs:
     - os: osx
       osx_image: xcode11
       dist: trusty
+      env:
+        - LDFLAGS="-L/usr/local/opt/llvm/lib"
+        - CPPFLAGS="-I/usr/local/opt/llvm/include"
       addons:
         homebrew:
           packages:
+            - clang
             - ninja
             - cmake
             - openssl

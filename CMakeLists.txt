@@ -15,7 +15,7 @@ include_directories(src)
 
 # Select compiler
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-    #set(CMAKE_CXX_COMPILER /usr/local/opt/llvm/bin/clang++ CACHE PATH "" FORCE) 
+    set(CMAKE_CXX_COMPILER /usr/local/opt/llvm/bin/clang++ CACHE PATH "" FORCE) 
 endif()
 
 # Compile mode
@@ -74,7 +74,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wundef")
 endif()
 
-add_definitions(-std=c++17)
+add_definitions(-std=c++20)
 file(GLOB SOURCE *.cpp src/*.cpp include/*.hpp)
 
 # Function for building
