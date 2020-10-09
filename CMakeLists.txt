@@ -14,7 +14,9 @@ include_directories(include)
 include_directories(src)
 
 # Select compiler
-set(CMAKE_CXX_COMPILER /usr/local/opt/llvm/bin/clang++ CACHE PATH "" FORCE) 
+if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+    #set(CMAKE_CXX_COMPILER /usr/local/opt/llvm/bin/clang++ CACHE PATH "" FORCE) 
+endif()
 
 # Compile mode
 set(CMAKE_CXX_FLAGS_DEBUG           "${CMAKE_CXX_FLAGS_DEBUG}           -DDEBUG  -g")
@@ -29,12 +31,12 @@ find_package(Threads REQUIRED)
 # Boost
 set(Boost_USE_STATIC_LIBS ON)
 set(BOOST_INCLUDEDIR "${CMAKE_SOURCE_DIR}/third-party")
-set(Boost_LIBRARY_DIRS "${CMAKE_SOURCE_DIR}/lib/boost")
+set(Boost_LIBRARY_DIRS "${CMAKE_SOURCE_DIR}/lib")
 find_package(Boost REQUIRED)
 if (NOT Boost_FOUND)
     message(FATAL_ERROR "Could not find Boost!")
 else()
-    message("@@ Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
+    #message("@@ Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
     message("@@ Boost_LIBRARY_DIRS: ${Boost_LIBRARY_DIRS}")
 endif()
 
