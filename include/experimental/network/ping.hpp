@@ -2,12 +2,12 @@
 #define PING_HPP
 
 #include <boost/asio.hpp>
-#include <boost/bind/bind.hpp>
 #include <chrono>
 #include <iomanip>
 #include <iostream>
 #include <istream>
 #include <ostream>
+#include <functional>
 
 #include "network/icmp_hdr.hpp"
 #include "network/ipv4_hdr.hpp"
@@ -54,7 +54,7 @@ private:
     // Wait up to five seconds for a reply.
     num_replies_ = 0;
     timer_.expires_at(time_sent_ + std::chrono::seconds(5));
-    timer_.async_wait(boost::bind(&pinger::handle_timeout, this));
+    timer_.async_wait(std::bind(&pinger::handle_timeout, this));
   }
 
   void handle_timeout() {
@@ -63,7 +63,7 @@ private:
     }
     // Requests must be sent no less than one second apart.
     timer_.expires_at(time_sent_ + std::chrono::seconds(1));
-    timer_.async_wait(boost::bind(&pinger::start_send, this));
+    timer_.async_wait(std::bind(&pinger::start_send, this));
   }
 
   void start_receive() {
@@ -73,7 +73,7 @@ private:
     // Wait for a reply. We prepare the buffer to receive up to 64KB.
     socket_.async_receive(
         reply_buffer_.prepare(65536),
-        boost::bind(&pinger::handle_receive, this, boost::placeholders::_2));
+        std::bind(&pinger::handle_receive, this, std::placeholders::_2));
   }
 
   void handle_receive(std::size_t len) {
