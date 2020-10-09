@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
-cmake_policy(VERSION 2.8)
+cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
+cmake_policy(VERSION 3.5)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
 # TODO: cmake_template -> your project name
@@ -14,7 +14,9 @@ include_directories(include)
 include_directories(src)
 
 # Select compiler
-set(CMAKE_CXX_COMPILER /usr/local/opt/llvm/bin/clang++ CACHE PATH "" FORCE) 
+if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+    set(CMAKE_CXX_COMPILER /usr/local/opt/llvm/bin/clang++ CACHE PATH "" FORCE) 
+endif()
 
 # Compile mode
 set(CMAKE_CXX_FLAGS_DEBUG           "${CMAKE_CXX_FLAGS_DEBUG}           -DDEBUG  -g")
@@ -28,12 +30,13 @@ find_package(Threads REQUIRED)
 
 # Boost
 set(Boost_USE_STATIC_LIBS ON)
-set(Boost_LIBRARY_DIRS "${CMAKE_SOURCE_DIR}/lib/boost")
-find_package(Boost COMPONENTS container REQUIRED)
+#set(BOOST_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/third-party")
+set(Boost_LIBRARY_DIRS "${CMAKE_SOURCE_DIR}/lib")
+find_package(Boost REQUIRED)
 if (NOT Boost_FOUND)
     message(FATAL_ERROR "Could not find Boost!")
 else()
-    message("@@ Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
+    #message("@@ Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
     message("@@ Boost_LIBRARY_DIRS: ${Boost_LIBRARY_DIRS}")
 endif()
 
@@ -60,25 +63,6 @@ else()
     include_directories(SYSTEM "${OPENSSL_INCLUDE_DIR}")
 endif()
 
-# libuv
-find_package(LibUV REQUIRED)
-if (NOT LIBUV_FOUND)
-    message(FATAL_ERROR "Could not find libuv!")
-else()
-    message("@@LIBUV_INCLUDE_DIR : ${LIBUV_INCLUDE_DIR}")
-    message("@@LIBUV_LIBRARIES : ${LIBUV_LIBRARIES}")
-endif()
-
-# libcurl
-find_package(CURL REQUIRED)
-if (NOT CURL_FOUND)
-    message(FATAL ERROR "Could not find curl!")
-else()
-    message("@@CURL_VERSION_STRING : ${CURL_VERSION_STRING}")
-    message("@@CURL_INCLUDE_DIRS : ${CURL_INCLUDE_DIRS}")
-    message("@@CURL_LIBRARIES: ${CURL_LIBRARIES}")
-endif()
-
 # Set preprocessor defines
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOMINMAX -D_USE_MATH_DEFINES")
 
@@ -87,8 +71,6 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wundef")
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything")
-    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++98-compat -Wno-c++98-compat-pedantic")
-    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-documentation")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wundef")
 endif()
 
@@ -113,8 +95,6 @@ function(build DIR_NAME TARGET_NAME)
         ${OPENSSL_LIBRARIES}
         ${Boost_LIBRARIES}
         ${JEMALLOC_SHARED_LIB}
-        ${LIBUV_LIBRARIES}
-        ${CURL_LIBRARIES}
     )
 endfunction(build)
 
@@ -145,10 +125,10 @@ set(TEST_TARGETS
     sha
     tolerance_compare
     easing
-    stack
-    queue
-    skew_heap
-    avl_tree
+    #stack
+    #queue
+    #skew_heap
+    #avl_tree
     uint8x2_uint16
     checksum
     asio_ping
@@ -163,9 +143,9 @@ set(TEST_TARGETS
     jemalloc_stats_print
     jemallctl
     jemalloc_leak_checking
-    uv_ping_pong
-    uv_tcp_echo_server
-    uv_wget
+    #uv_ping_pong
+    #uv_tcp_echo_server
+    #uv_wget
     beast_http_client
 )
 testAll()
