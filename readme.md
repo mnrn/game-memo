@@ -1,5 +1,7 @@
 # ゲームメモ
 
+[![Build Status](https://travis-ci.org/mnrn/game-memo.svg?branch=master)](https://travis-ci.org/mnrn/game-memo)
+
 ゲームで役立つ知識のコードをメモしています。  
 実装は C++ ですが、他の言語でもすぐ応用できるようなものが多いです。  
 
@@ -63,7 +65,7 @@ STLのライブラリでまだ不安定なものが入ることが多いです�
 
 - Networking (WIP)
 - Synchronization
-- CI (expect Travis CI)
+- ~~CI (expect Travis CI)~~
 - Support Windows (DirectX12?)
 
 ## Directory tree
@@ -73,6 +75,7 @@ STLのライブラリでまだ不安定なものが入ることが多いです�
 ├── readme.md
 ├── .clang-format.yml
 ├── .gitignore
+├── .travis.yml
 ├── LICENSE
 ├── CMakeList.txt
 ├── cmake

@@ -3,5 +3,4 @@
 /data
 /ssl
 /scripts
-/pkgconfig
 *.heap
