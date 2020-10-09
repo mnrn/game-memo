@@ -15,7 +15,7 @@ include_directories(src)
 
 # Select compiler
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-    set(CMAKE_CXX_COMPILER "$(brew --prefix llvm)/bin/clang++" CACHE PATH "" FORCE) 
+    set(CMAKE_CXX_COMPILER /usr/local/opt/llvm/bin/clang++ CACHE PATH "" FORCE) 
 endif()
 
 # Compile mode
@@ -52,7 +52,7 @@ endif()
 
 # OpenSSL
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-    set(OPENSSL_ROOT_DIR "$(brew --prefix openssl)")
+    set(OPENSSL_ROOT_DIR "/usr/local/opt/openssl")
 endif()
 find_package(OpenSSL REQUIRED)
 if (NOT OPENSSL_FOUND)
