@@ -30,7 +30,7 @@ find_package(Threads REQUIRED)
 
 # Boost
 set(Boost_USE_STATIC_LIBS ON)
-set(BOOST_INCLUDEDIR "${CMAKE_SOURCE_DIR}/third-party")
+#set(BOOST_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/third-party")
 set(Boost_LIBRARY_DIRS "${CMAKE_SOURCE_DIR}/lib")
 find_package(Boost REQUIRED)
 if (NOT Boost_FOUND)

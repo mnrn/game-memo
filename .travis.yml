@@ -7,12 +7,13 @@ jobs:
     - os: osx
       osx_image: xcode11
       dist: trusty
-
-
-before_install:
-  #- if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew update ; fi
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew install openssl; fi
+      addons:
+        homebrew:
+          packages:
+            - ninja
+            - cmake
+            - openssl
 
 script:
-  - cmake -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_BUILD_TYPE:STRING=Debug -H. -B./build
+  - cmake -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_BUILD_TYPE:STRING=Debug -H. -B./build -G "Ninja"
   - cmake --build ./build
