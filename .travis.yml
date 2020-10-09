@@ -1,0 +1,7 @@
+dist: trusty
+sudo: false
+language: cpp
+
+script:
+  - cmake -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_BUILD_TYPE:STRING=Debug -H. -B./build
+  - cmake --build ./build
