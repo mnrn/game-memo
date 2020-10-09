@@ -2,18 +2,16 @@ language: cpp
 os:
   osx
 
-cache:
-  ccache: true
-  directories:
-    - $HOME/Library/Caches/Homebrew
-
 jobs:
   include:
     - os: osx
       osx_image: xcode11
       dist: trusty
+      cache:
+        ccache: true
+        directories:
+          - $HOME/Library/Caches/Homebrew
       env:
-        - COMPILER="clang++"
         - LDFLAGS="-L$(brew --prefix llvm)/lib"
         - CPPFLAGS="-I$(brew --prefix llvm)/include"
       addons:
