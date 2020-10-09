@@ -4,9 +4,9 @@ os:
 
 jobs:
   include:
-    -os: osx
-    os_image: xcode11
-    dist: trusty
+    - os: osx
+      osx_image: xcode11
+      dist: trusty
 
 
 before_install:
