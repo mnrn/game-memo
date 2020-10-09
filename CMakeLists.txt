@@ -33,7 +33,7 @@ find_package(Boost COMPONENTS container REQUIRED)
 if (NOT Boost_FOUND)
     message(FATAL_ERROR "Could not find Boost!")
 else()
-    #message("@@ Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
+    message("@@ Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
     message("@@ Boost_LIBRARY_DIRS: ${Boost_LIBRARY_DIRS}")
 endif()
 
@@ -49,7 +49,7 @@ endif()
 
 # OpenSSL
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-    set(OPENSSL_ROOT_DIR "/usr/local/opt/openssl@1.1")
+    set(OPENSSL_ROOT_DIR "/usr/local/opt/openssl")
 endif()
 find_package(OpenSSL REQUIRED)
 if (NOT OPENSSL_FOUND)
@@ -166,5 +166,6 @@ set(TEST_TARGETS
     uv_ping_pong
     uv_tcp_echo_server
     uv_wget
+    beast_http_client
 )
 testAll()

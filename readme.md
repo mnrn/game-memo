@@ -31,6 +31,15 @@ cmake --build /path/to/build --parallel 13
   - [spdlog]
 - header & lib
   - [boost]
+    - asio.hpp
+    - beast.hpp
+    - noncopyable.hpp
+    - assert.hpp
+    - container
+      - pmr/polymorphic_allocator.hpp
+    - math
+      - constants/constants.hpp
+    - process.hpp
   - [jemalloc]
   - [openssl]
   - [libuv]
