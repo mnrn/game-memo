@@ -13,7 +13,7 @@ jobs:
       addons:
         homebrew:
           packages:
-            - clang
+            - llvm
             - ninja
             - cmake
             - openssl
