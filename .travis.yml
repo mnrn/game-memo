@@ -10,7 +10,7 @@ jobs:
 
 
 before_install:
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew update  ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew update --quiet ; fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew install openssl; fi
 
 script:

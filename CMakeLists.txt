@@ -74,7 +74,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wundef")
 endif()
 
-add_definitions(-std=c++20)
+add_definitions(-std=c++17)
 file(GLOB SOURCE *.cpp src/*.cpp include/*.hpp)
 
 # Function for building
