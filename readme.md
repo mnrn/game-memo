@@ -47,6 +47,7 @@ STLのライブラリでまだ不安定なものが入ることが多いです�
 
 - boost
   - asio.hpp
+  - asio/ssl.hpp
   - beast.hpp
   - noncopyable.hpp
   - assert.hpp
