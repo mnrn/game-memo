@@ -146,6 +146,7 @@ set(TEST_TARGETS
     #uv_ping_pong
     #uv_tcp_echo_server
     #uv_wget
-    beast_http_client
+    beast-http-client-sync
+    beast-websocket-client-sync
 )
 testAll()

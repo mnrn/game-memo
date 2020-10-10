@@ -17,11 +17,11 @@ using tcp = net::ip::tcp;
 int main(int argc, char **argv) {
   try {
     if (argc != 4 && argc != 5) {
-      std::cerr << "Usage: http-client-sync <host> <port> <target> [<HTTP "
+      std::cerr << "Usage: beast-http-client-sync <host> <port> <target> [<HTTP "
                    "version: 1.0 or 1.1(default)>]\n"
                 << "Example:\n"
-                << "    http-client-sync www.example.com 80 /\n"
-                << "    http-client-sync www.example.com 80 / 1.0\n";
+                << "    beast-http-client-sync www.example.com 80 /\n"
+                << "    beast-http-client-sync www.example.com 80 / 1.0\n";
       return EXIT_FAILURE;
     }
     const auto host = argv[1];
