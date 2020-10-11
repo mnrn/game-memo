@@ -10,7 +10,7 @@ cache:
 jobs:
   include:
     - os: osx
-      osx_image: xcode11
+      osx_image: xcode11.5
       dist: trusty
       env:
         - LDFLAGS="-L$(brew --prefix llvm)/lib"
