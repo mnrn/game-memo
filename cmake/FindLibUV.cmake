@@ -20,26 +20,17 @@
 # https://github.com/neovim/neovim/blob/master/cmake/FindLibUV.cmake
 #
 
-find_package(PkgConfig)
-if (PKG_CONFIG_FOUND)
-  pkg_check_modules(PC_LIBUV QUIET libuv)
-endif()
-
 find_path(LIBUV_INCLUDE_DIR uv.h
-  HINTS ${PC_LIBUV_INCLUDEDIR} ${PC_LIBUV_INCLUDE_DIRS})
+  HINTS ${LIBUV_INCLUDEDIR} ${LIBUV_INCLUDE_DIRS})
 
 list(APPEND LIBUV_NAMES uv)
 
 find_library(LIBUV_LIBRARY NAMES ${LIBUV_NAMES}
-  HINTS ${PC_LIBUV_LIBDIR} ${PC_LIBUV_LIBRARY_DIRS})
+  HINTS ${LIBUV_LIBDIR} ${LIBUV_LIBRARY_DIRS})
 
 mark_as_advanced(LIBUV_INCLUDE_DIR LIBUV_LIBRARY)
 
-if(PC_LIBUV_LIBRARIES)
-    list(REMOVE_ITEM PC_LIBUV_LIBRARIES uv)
-endif()
-
-set(LIBUV_LIBRARIES ${LIBUV_LIBRARY} ${PC_LIBUV_LIBRARIES})
+set(LIBUV_LIBRARIES ${LIBUV_LIBRARY} ${LIBUV_LIBRARIES})
 set(LIBUV_INCLUDE_DIRS ${LIBUV_INCLUDE_DIR})
 
 # Deal with the fact that libuv.pc is missing important dependency information.
@@ -90,11 +81,10 @@ if(WIN32)
   list(APPEND LIBUV_LIBRARIES ws2_32)
 endif()
 
-include(FindPackageHandleStandardArgs)
-
-# handle the QUIETLY and REQUIRED arguments and set LIBUV_FOUND to TRUE
-# if all listed variables are TRUE
-find_package_handle_standard_args(LibUV DEFAULT_MSG
-                                  LIBUV_LIBRARY LIBUV_INCLUDE_DIR)
+if(LIBUV_INCLUDE_DIR AND LIBUV_LIBRARIES)
+  set(LIBUV_FOUND TRUE)
+else()
+  set(LIBUV__FOUND FALSE)
+endif()
 
 mark_as_advanced(LIBUV_INCLUDE_DIR LIBUV_LIBRARY)
