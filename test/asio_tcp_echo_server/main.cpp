@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
     boost::asio::io_context icx;
     server s(icx, std::atoi(argv[1]));
     icx.run();
-  } catch (std::exception &e) {
+  } catch (const std::exception &e) {
     std::cerr << "Exception: " << e.what() << std::endl;
   }
   return EXIT_SUCCESS;

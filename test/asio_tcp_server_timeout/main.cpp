@@ -275,7 +275,6 @@ private:
 
 class udp_broadcaster : public subscriber {
 public:
-  using steady_timer = boost::asio::steady_timer;
   using udp = boost::asio::ip::udp;
   using error_code = boost::system::error_code;
 
@@ -296,7 +295,6 @@ private:
 
 class server {
 public:
-  using steady_timer = boost::asio::steady_timer;
   using tcp = boost::asio::ip::tcp;
   using udp = boost::asio::ip::udp;
   using error_code = boost::system::error_code;
@@ -341,7 +339,7 @@ int main(int argc, char *argv[]) {
 
     server s(io_context, listen_endpoint, broadcast_endpoint);
     io_context.run();
-  } catch (std::exception &e) {
+  } catch (const std::exception &e) {
     std::cerr << "Exception: " << e.what() << std::endl;
   }
 }

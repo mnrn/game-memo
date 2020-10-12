@@ -259,7 +259,7 @@ int main(int argc, char *argv[]) {
     client c(io_context);
     c.start(r.resolve(argv[1], argv[2]));
     io_context.run();
-  } catch (std::exception &e) {
+  } catch (const std::exception &e) {
     std::cerr << "Excetion: " << e.what() << std::endl;
   }
 }

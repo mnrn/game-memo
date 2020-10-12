@@ -168,7 +168,7 @@ int main(int argc, char *argv[]) {
     boost::asio::io_context io_context;
     server s(io_context, std::atoi(argv[1]));
     io_context.run();
-  } catch (std::exception &e) {
+  } catch (const std::exception &e) {
     std::cerr << "Exception: " << e.what() << std::endl;
   }
   return 0;
