@@ -13,27 +13,8 @@
 #include <set>
 #include <string>
 
-class subscriber {
-public:
-  virtual ~subscriber() = default;
-  virtual void deliver(const std::string &msg) = 0;
-};
-
-class channel {
-public:
-  using subscriber_ptr = std::shared_ptr<subscriber>;
-
-  void join(subscriber_ptr subscriber) { subscribers_.emplace(subscriber); }
-  void leave(subscriber_ptr subscriber) { subscribers_.erase(subscriber); }
-  void deliver(const std::string &msg) {
-    for (const auto &s : subscribers_) {
-      s->deliver(msg);
-    }
-  }
-
-private:
-  std::set<subscriber_ptr> subscribers_;
-};
+#include "experimental/network/utility.hpp"
+#include "experimental/network/udp_broadcaster.hpp"
 
 //----------------------------------------------------------------------
 
@@ -110,14 +91,14 @@ private:
 // FROM:
 // https://www.boost.org/doc/html/boost_asio/example/cpp11/timeouts/server.cpp
 //
-class tcp_session : public subscriber,
+class tcp_session : public net::subscriber,
                     public std::enable_shared_from_this<tcp_session> {
 public:
   using steady_timer = boost::asio::steady_timer;
   using tcp = boost::asio::ip::tcp;
   using error_code = boost::system::error_code;
 
-  tcp_session(tcp::socket socket, channel &ch)
+  tcp_session(tcp::socket socket, net::channel &ch)
       : channel_(ch), socket_(std::move(socket)) {
     input_deadline_.expires_at(steady_timer::time_point::max());
     output_deadline_.expires_at(steady_timer::time_point::max());
@@ -264,33 +245,13 @@ private:
     });
   }
 
-  channel &channel_;
+  net::channel &channel_;
   tcp::socket socket_;
   std::string input_buffer_;
   steady_timer input_deadline_{socket_.get_executor()};
   std::deque<std::string> output_queue_;
   steady_timer non_empty_output_queue_{socket_.get_executor()};
   steady_timer output_deadline_{socket_.get_executor()};
-};
-
-class udp_broadcaster : public subscriber {
-public:
-  using udp = boost::asio::ip::udp;
-  using error_code = boost::system::error_code;
-
-  udp_broadcaster(boost::asio::io_context &io_context,
-                  const udp::endpoint &broadcast_endpoint)
-      : socket_(io_context) {
-    socket_.connect(broadcast_endpoint);
-    socket_.set_option(udp::socket::broadcast(true));
-  }
-
-private:
-  void deliver(const std::string &msg) {
-    error_code ignored_error;
-    socket_.send(boost::asio::buffer(msg), 0, ignored_error);
-  }
-  udp::socket socket_;
 };
 
 class server {
@@ -304,7 +265,7 @@ public:
          const udp::endpoint &broadcast_endpoint)
       : io_context_(io_context), acceptor_(io_context, listen_endpoint) {
     channel_.join(
-        std::make_shared<udp_broadcaster>(io_context_, broadcast_endpoint));
+        std::make_shared<net::udp::broadcaster>(io_context_, broadcast_endpoint));
     accept();
   }
 
@@ -321,7 +282,7 @@ private:
 
   boost::asio::io_context &io_context_;
   tcp::acceptor acceptor_;
-  channel channel_;
+  net::channel channel_;
 };
 
 int main(int argc, char *argv[]) {
@@ -329,7 +290,7 @@ int main(int argc, char *argv[]) {
     if (argc != 4) {
       std::cerr << "Usage: server <listen_port> <bcast_address> <bcast_port>"
                 << std::endl;
-      return 1;
+      return EXIT_FAILURE;
     }
     boost::asio::io_context io_context;
     boost::asio::ip::tcp::endpoint listen_endpoint(boost::asio::ip::tcp::v4(),
@@ -342,4 +303,5 @@ int main(int argc, char *argv[]) {
   } catch (const std::exception &e) {
     std::cerr << "Exception: " << e.what() << std::endl;
   }
+  return EXIT_SUCCESS;
 }
