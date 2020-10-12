@@ -147,7 +147,7 @@ set(TEST_TARGETS
     asio_ssl_client
     asio_tcp_client_timeout
     asio_tcp_server_timeout
-    asio_read_write
+    asio_third_party
     asio_write_fsm
     asio_write_coro
     asio_tcp_echo_server
@@ -156,7 +156,6 @@ set(TEST_TARGETS
     jemalloc_leak_checking
     uv_ping_pong
     uv_tcp_echo_server
-    #uv_wget
     beast_http_client_sync
     beast_websocket_client_sync
 )
