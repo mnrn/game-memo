@@ -19,7 +19,7 @@ public:
 
   // Returns true if the third party library wawnts to be notified when the
   // socket is ready for reading.
-  constexpr bool want_read() const { return state_ == state::reading; }
+  bool want_read() const { return state_ == state::reading; }
 
   // Notify that third party library that it should perform its read operation.
   void do_read(error_code &err) {
@@ -31,7 +31,7 @@ public:
 
   // Returns true if the third party library wants to be notified when the
   // socket is ready for writing.
-  constexpr bool want_write() const { return state_ == state::writing; }
+  bool want_write() const { return state_ == state::writing; }
 
   // Notify that third party library that it should perform its write operation.
   void do_write(error_code &err) {
