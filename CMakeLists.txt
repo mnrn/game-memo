@@ -147,7 +147,7 @@ set(TEST_TARGETS
     asio_ssl_client
     asio_tcp_client_timeout
     asio_tcp_server_timeout
-    asio_third_party
+    asio_third_party_io
     asio_write_fsm
     asio_write_coro
     asio_tcp_echo_server
