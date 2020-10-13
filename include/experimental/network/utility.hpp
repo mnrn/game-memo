@@ -1,24 +1,25 @@
 #ifndef EXPERIMENTAL_NETWORK_UTILITY_HPP
 #define EXPERIMENTAL_NETWORK_UTILITY_HPP
 
-
-#include <uv.h>
-
+#include <memory>
 #include <set>
 #include <string>
-#include <memory>
 
 namespace net {
 class subscriber {
-  public:
+public:
   virtual ~subscriber() = default;
   virtual void deliver(const std::string &msg) = 0;
 };
 
 class channel {
 public:
-  void join(std::shared_ptr<subscriber> subscriber) { subscribers_.emplace(subscriber); }
-  void leave(std::shared_ptr<subscriber> subscriber) { subscribers_.erase(subscriber); }
+  void join(std::shared_ptr<subscriber> subscriber) {
+    subscribers_.emplace(subscriber);
+  }
+  void leave(std::shared_ptr<subscriber> subscriber) {
+    subscribers_.erase(subscriber);
+  }
   void deliver(const std::string &msg) {
     for (const auto &s : subscribers_) {
       s->deliver(msg);

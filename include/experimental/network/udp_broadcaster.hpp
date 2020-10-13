@@ -1,9 +1,8 @@
 #ifndef UDP_BROADCASTER_HPP
 #define UDP_BROADCASTER_HPP
 
-#include <boost/asio/ip/udp.hpp>
-
 #include "experimental/network/utility.hpp"
+#include <boost/asio/ip/udp.hpp>
 
 namespace net {
 namespace udp {
@@ -14,7 +13,7 @@ public:
   using error_code = boost::system::error_code;
 
   broadcaster(boost::asio::io_context &io_context,
-                  const udp::endpoint &broadcast_endpoint)
+              const udp::endpoint &broadcast_endpoint)
       : socket_(io_context) {
     socket_.connect(broadcast_endpoint);
     socket_.set_option(udp::socket::broadcast(true));
@@ -28,7 +27,7 @@ private:
   udp::socket socket_;
 };
 
-}
-}
+} // namespace udp
+} // namespace net
 
 #endif

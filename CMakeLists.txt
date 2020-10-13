@@ -63,15 +63,16 @@ else()
     include_directories(SYSTEM "${OPENSSL_INCLUDE_DIR}")
 endif()
 
-set(LIBUV_INCLUDEDIR "${CMAKE_SOURCE_DIR}/third-party")
-set(LIBUV_LIBDIR "${CMAKE_SOURCE_DIR}/lib/uv")
-find_package(LibUV)
-if (NOT LIBUV_FOUND)
-    message(FATAL_ERROR "Could not find libuv")
-else()
-    message("@@LIBUV_INCLUDE_DIRS : ${LIBUV_INCLUDE_DIRS}")
-    message("@@LIBUV_LIBRARIES : ${LIBUV_LIBRARIES}")
-endif()
+# libuv
+#set(LIBUV_INCLUDEDIR "${CMAKE_SOURCE_DIR}/third-party")
+#set(LIBUV_LIBDIR "${CMAKE_SOURCE_DIR}/lib/uv")
+#find_package(LibUV)
+#if (NOT LIBUV_FOUND)
+#    message(FATAL_ERROR "Could not find libuv")
+#else()
+#    message("@@LIBUV_INCLUDE_DIRS : ${LIBUV_INCLUDE_DIRS}")
+#    message("@@LIBUV_LIBRARIES : ${LIBUV_LIBRARIES}")
+#endif()
 
 # Set preprocessor defines
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOMINMAX -D_USE_MATH_DEFINES")
@@ -105,7 +106,6 @@ function(build DIR_NAME TARGET_NAME)
         ${OPENSSL_LIBRARIES}
         ${JEMALLOC_SHARED_LIB}
         ${Boost_LIBRARIES}
-        ${LIBUV_LIBRARIES}
     )
 endfunction(build)
 
@@ -154,8 +154,8 @@ set(TEST_TARGETS
     jemalloc_stats_print
     jemallctl
     jemalloc_leak_checking
-    uv_ping_pong
-    uv_tcp_echo_server
+    #uv_ping_pong
+    #uv_tcp_echo_server
     beast_http_client_sync
     beast_websocket_client_sync
 )
