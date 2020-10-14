@@ -119,12 +119,12 @@ void fail(beast::error_code ec, const char *what) {
 }
 
 // The function object is used to send an HTTP message.
-template <class Stream> struct send_lm {
+template <class Stream> struct send_lambda {
   Stream &stream_;
   bool &close_;
   beast::error_code &ec_;
 
-  explicit send_lm(Stream &stream, bool &close, beast::error_code &ec)
+  explicit send_lambda(Stream &stream, bool &close, beast::error_code &ec)
       : stream_(stream), close_(close), ec_(ec) {}
 
   template <bool isRequest, class Body, class Fields>
@@ -150,7 +150,7 @@ void do_session(asio::ip::tcp::socket &socket,
   beast::flat_buffer buf;
 
   // This lambda is used to send message.
-  send_lm<asio::ip::tcp::socket> lm{socket, close, ec};
+  send_lambda<asio::ip::tcp::socket> lambda{socket, close, ec};
 
   for (;;) {
     // Read a request.
@@ -163,7 +163,7 @@ void do_session(asio::ip::tcp::socket &socket,
     }
 
     // Send the message
-    handle_request(*doc_root, std::move(req), lm);
+    handle_request(*doc_root, std::move(req), lambda);
     if (ec) {
       return fail(ec, "write");
     } else if (close) {
