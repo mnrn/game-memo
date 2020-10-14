@@ -158,5 +158,6 @@ set(TEST_TARGETS
     #uv_tcp_echo_server
     beast_http_client_sync
     beast_websocket_client_sync
+    beast_http_server_sync
 )
 testAll()
