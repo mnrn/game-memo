@@ -9,102 +9,22 @@
 #include <string>
 #include <thread>
 
+#include "experimental/network/mime.hpp"
+#include "experimental/network/url.hpp"
+
 namespace beast = boost::beast;
-namespace http = beast::http;
-namespace net = boost::asio;
-using tcp = net::ip::tcp;
-
-// Return a reasonable mime type based on the extension of a file.
-beast::string_view mime_type(beast::string_view path) {
-  using beast::iequals;
-  const auto ext = [&path] {
-    const auto pos = path.rfind(".");
-    return pos == beast::string_view::npos ? beast::string_view{}
-                                           : path.substr(pos);
-  }();
-
-  if (iequals(ext, ".htm")) {
-    return "text/html";
-  } else if (iequals(ext, ".html")) {
-    return "text/html";
-  } else if (iequals(ext, ".php")) {
-    return "text/html";
-  } else if (iequals(ext, ".css")) {
-    return "text/css";
-  } else if (iequals(ext, ".txt")) {
-    return "text/plain";
-  } else if (iequals(ext, ".js")) {
-    return "application/javascript";
-  } else if (iequals(ext, ".json")) {
-    return "application/json";
-  } else if (iequals(ext, ".xml")) {
-    return "application/xml";
-  } else if (iequals(ext, ".swf")) {
-    return "application/x-shockwave-flash";
-  } else if (iequals(ext, ".flv")) {
-    return "video/x-flv";
-  } else if (iequals(ext, ".png")) {
-    return "image/png";
-  } else if (iequals(ext, ".jpe")) {
-    return "image/jpeg";
-  } else if (iequals(ext, ".jpeg")) {
-    return "image/jpeg";
-  } else if (iequals(ext, ".jpg")) {
-    return "image/jpeg";
-  } else if (iequals(ext, ".gif")) {
-    return "image/gif";
-  } else if (iequals(ext, ".bmp")) {
-    return "image/bmp";
-  } else if (iequals(ext, ".ico")) {
-    return "image/vnd.microsoft.icon";
-  } else if (iequals(ext, ".tiff")) {
-    return "image/tiff";
-  } else if (iequals(ext, ".tif")) {
-    return "image/tiff";
-  } else if (iequals(ext, ".svg")) {
-    return "image/svg+xml";
-  } else if (iequals(ext, ".svgz")) {
-    return "image/svg+xml";
-  } else {
-    return "application/text";
-  }
-}
-
-// Append an HTTP rel-path to a local filesystem path.
-// The returned path is normalized for the platform.
-std::string path_cat(beast::string_view base, beast::string_view path) {
-  if (base.empty()) {
-    return std::string(path);
-  }
-  std::string result(base);
-#ifdef BOOST_MSVC
-  constexpr char path_sep = '\\';
-  if (result.back() == path.sep) {
-    result.resize(result.size() - 1);
-  }
-  result.append(path.data(), path.size());
-  for (auto &c : result) {
-    if (c == '/') {
-      c = path_sep;
-    }
-  }
-#else
-  constexpr char path_sep = '/';
-  if (result.back() == path_sep) {
-    result.resize(result.size() - 1);
-  }
-  result.append(path.data(), path.size());
-#endif
-  return result;
-}
+namespace asio = boost::asio;
 
 // This function produces an HTTP response for the given request. The type of
 // the response object depends on the contents of the request, so the interface
 // requires the caller to pass a generic lambda for receiving the response.
 template <class Body, class Allocator, class Send>
-void handle_request(beast::string_view doc_root,
-                    http::request<Body, http::basic_fields<Allocator>> &&req,
-                    Send &&send) {
+void handle_request(
+    beast::string_view doc_root,
+    beast::http::request<Body, beast::http::basic_fields<Allocator>> &&req,
+    Send &&send) {
+  namespace http = beast::http;
+
   // Returns a bad request response.
   const auto bad_request = [&req](beast::string_view why) {
     http::response<http::string_body> res{http::status::bad_request,
@@ -153,7 +73,7 @@ void handle_request(beast::string_view doc_root,
   }
 
   // Build the path to het requested file.
-  std::string path = path_cat(doc_root, req.target());
+  std::string path = net::http::url::path_cat(doc_root, req.target());
   if (req.target().back() == '/') {
     path.append("index.html");
   }
@@ -178,7 +98,7 @@ void handle_request(beast::string_view doc_root,
   if (req.method() == http::verb::head) {
     http::response<http::empty_body> res{http::status::ok, req.version()};
     res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-    res.set(http::field::content_type, mime_type(path));
+    res.set(http::field::content_type, net::http::mime::type(path));
     res.keep_alive(req.keep_alive());
     return send(std::move(res));
   }
@@ -203,24 +123,25 @@ template <class Stream> struct send_lm {
   Stream &stream_;
   bool &close_;
   beast::error_code &ec_;
+
   explicit send_lm(Stream &stream, bool &close, beast::error_code &ec)
       : stream_(stream), close_(close), ec_(ec) {}
 
   template <bool isRequest, class Body, class Fields>
-  void operator()(http::message<isRequest, Body, Fields> &&msg) const {
+  void operator()(beast::http::message<isRequest, Body, Fields> &&msg) const {
     // Determine if we should close the connetion after.
     close_ = msg.need_eof();
 
     // We need the serializer here because the the serializer requieres a
     // non-const file_body, and the message oriented version of http::write
     // only works with const messages.
-    http::serializer<isRequest, Body, Fields> sr{msg};
-    http::write(stream_, sr, ec_);
+    beast::http::serializer<isRequest, Body, Fields> sr{msg};
+    beast::http::write(stream_, sr, ec_);
   }
 };
 
 // Handles an HTTP server connection.
-void do_session(tcp::socket &socket,
+void do_session(asio::ip::tcp::socket &socket,
                 const std::shared_ptr<const std::string> &doc_root) {
   bool close = false;
   beast::error_code ec;
@@ -229,13 +150,13 @@ void do_session(tcp::socket &socket,
   beast::flat_buffer buf;
 
   // This lambda is used to send message.
-  send_lm<tcp::socket> lm{socket, close, ec};
+  send_lm<asio::ip::tcp::socket> lm{socket, close, ec};
 
   for (;;) {
     // Read a request.
-    http::request<http::string_body> req;
-    http::read(socket, buf, req, ec);
-    if (ec == http::error::end_of_stream) {
+    beast::http::request<beast::http::string_body> req;
+    beast::http::read(socket, buf, req, ec);
+    if (ec == beast::http::error::end_of_stream) {
       break;
     } else if (ec) {
       return fail(ec, "read");
@@ -253,7 +174,7 @@ void do_session(tcp::socket &socket,
   }
 
   // Send a TCP shutdown
-  socket.shutdown(tcp::socket::shutdown_send, ec);
+  socket.shutdown(asio::ip::tcp::socket::shutdown_send, ec);
 
   // At this point the connection is closed gracefully.
 }
@@ -267,18 +188,18 @@ int main(int argc, const char *argv[]) {
                 << " beast_http_server_sync 0.0.0.0 8080 ." << std::endl;
       return EXIT_FAILURE;
     }
-    const auto address = net::ip::make_address(argv[1]);
+    const auto address = asio::ip::make_address(argv[1]);
     const auto port = static_cast<std::uint16_t>(std::atoi(argv[2]));
     const auto doc_root = std::make_shared<std::string>(argv[3]);
 
     // The io_context is required for all I/O.
-    net::io_context ioc{1};
+    asio::io_context ioc{1};
 
     // The acceptor receives incomming connectios.
-    tcp::acceptor acceptor{ioc, {address, port}};
+    asio::ip::tcp::acceptor acceptor{ioc, {address, port}};
     for (;;) {
       // This will receive the new connection.
-      tcp::socket socket{ioc};
+      asio::ip::tcp::socket socket{ioc};
 
       // Block until we get a connection.
       acceptor.accept(socket);
