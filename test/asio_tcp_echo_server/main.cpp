@@ -4,10 +4,11 @@
 #include <memory>
 #include <utility>
 
+using tcp = boost::asio::ip::tcp;
+using error = boost::system::error_code;
+
 class session : public std::enable_shared_from_this<session> {
 public:
-  using tcp = boost::asio::ip::tcp;
-  using error = boost::system::error_code;
   explicit session(tcp::socket socket) : sock_(std::move(socket)) {}
   void start() { do_read(); }
 
@@ -36,9 +37,6 @@ private:
 
 class server {
 public:
-  using tcp = boost::asio::ip::tcp;
-  using error = boost::system::error_code;
-
   explicit server(boost::asio::io_context &icx, unsigned short port)
       : acceptor_(icx, tcp::endpoint(tcp::v6(), port)) {
     do_accept();
@@ -65,7 +63,7 @@ int main(int argc, char *argv[]) {
     boost::asio::io_context icx;
     server s(icx, std::atoi(argv[1]));
     icx.run();
-  } catch (std::exception &e) {
+  } catch (const std::exception &e) {
     std::cerr << "Exception: " << e.what() << std::endl;
   }
   return EXIT_SUCCESS;

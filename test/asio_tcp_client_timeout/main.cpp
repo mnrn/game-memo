@@ -4,6 +4,7 @@
 #include <boost/asio/read_until.hpp>
 #include <boost/asio/steady_timer.hpp>
 #include <boost/asio/write.hpp>
+#include <cstdlib>
 #include <functional>
 #include <iostream>
 #include <string>
@@ -77,8 +78,7 @@ public:
   using tcp = boost::asio::ip::tcp;
   using steady_timer = boost::asio::steady_timer;
   explicit client(boost::asio::io_context &io_context)
-      : socket_(io_context), deadline_(io_context),
-        heartbeat_timer_(io_context) {}
+      : socket_(io_context), deadline_(io_context), heartbeat_(io_context) {}
 
   // Called by the user of the client class to initiate the connection process.
   // The endpoints will have been obtained using a tcp::resolver.
@@ -101,7 +101,7 @@ public:
     boost::system::error_code ignore_error;
     socket_.close(ignore_error);
     deadline_.cancel();
-    heartbeat_timer_.cancel();
+    heartbeat_.cancel();
   }
 
 private:
@@ -122,7 +122,7 @@ private:
     }
   }
 
-  void handle_connect(const boost::system::error_code &err,
+  void handle_connect(const boost::system::error_code &ec,
                       tcp::resolver::results_type::iterator endpoint_iter) {
     if (stopped_) {
       return;
@@ -136,8 +136,8 @@ private:
       start_connect(++endpoint_iter);
     }
     // Check if the connect operartion failed before the deadline expired.
-    else if (err) {
-      std::cout << "Connect error: " << err.message() << std::endl;
+    else if (ec) {
+      std::cout << "Connect error: " << ec.message() << std::endl;
 
       // We need to close the coket used in the previous connection attempt
       // before starting a new one.
@@ -166,12 +166,12 @@ private:
                   std::placeholders::_2));
   }
 
-  void handle_read(const boost::system::error_code &err, std::size_t n) {
+  void handle_read(const boost::system::error_code &ec, std::size_t n) {
     if (stopped_) {
       return;
     }
 
-    if (!err) {
+    if (!ec) {
       // Extract the newline-delimited message from the buffer.
       std::string line(input_buffer_.substr(0, n - 1));
       input_buffer_.erase(0, n);
@@ -183,7 +183,7 @@ private:
 
       start_read();
     } else {
-      std::cout << "Error on receive: " << err.message() << std::endl;
+      std::cout << "Error on receive: " << ec.message() << std::endl;
 
       stop();
     }
@@ -201,17 +201,17 @@ private:
         std::bind(&client::handle_write, this, std::placeholders::_1));
   }
 
-  void handle_write(const boost::system::error_code &err) {
+  void handle_write(const boost::system::error_code &ec) {
     if (stopped_) {
       return;
     }
 
-    if (!err) {
+    if (!ec) {
       // Wait 10 seconds before seding the next heartbeat.
-      heartbeat_timer_.expires_after(std::chrono::seconds(10));
-      heartbeat_timer_.async_wait(std::bind(&client::start_write, this));
+      heartbeat_.expires_after(std::chrono::seconds(10));
+      heartbeat_.async_wait(std::bind(&client::start_write, this));
     } else {
-      std::cout << "Error on heartbeat: " << err.message() << std::endl;
+      std::cout << "Error on heartbeat: " << ec.message() << std::endl;
 
       stop();
     }
@@ -245,21 +245,22 @@ private:
   tcp::socket socket_;
   std::string input_buffer_;
   steady_timer deadline_;
-  steady_timer heartbeat_timer_;
+  steady_timer heartbeat_;
 };
 
 int main(int argc, char *argv[]) {
   try {
     if (argc != 3) {
       std::cerr << "Usage: client <host> <port>" << std::endl;
-      return 1;
+      return EXIT_FAILURE;
     }
     boost::asio::io_context io_context;
     boost::asio::ip::tcp::resolver r(io_context);
     client c(io_context);
     c.start(r.resolve(argv[1], argv[2]));
     io_context.run();
-  } catch (std::exception &e) {
+  } catch (const std::exception &e) {
     std::cerr << "Excetion: " << e.what() << std::endl;
   }
+  return EXIT_SUCCESS;
 }

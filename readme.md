@@ -65,7 +65,6 @@ STLのライブラリでまだ不安定なものが入ることが多いです�
 
 - Networking (WIP)
 - Synchronization
-- ~~CI (expect Travis CI)~~
 - Support Windows (DirectX12?)
 
 ## Directory tree
