@@ -32,12 +32,15 @@ find_package(Threads REQUIRED)
 set(Boost_USE_STATIC_LIBS ON)
 #set(BOOST_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/third-party")
 set(Boost_LIBRARY_DIRS "${CMAKE_SOURCE_DIR}/lib")
-find_package(Boost REQUIRED)
+find_package(Boost REQUIRED coroutine)
 if (NOT Boost_FOUND)
     message(FATAL_ERROR "Could not find Boost!")
 else()
     #message("@@ Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
     message("@@ Boost_LIBRARY_DIRS: ${Boost_LIBRARY_DIRS}")
+    set(other_flags "${other_flags} -frtti -fvisibility-inlines-hidden")
+    set(other_flags "${other_flags} -fvisibility=hidden")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${other_flags}")
 endif()
 
 # jemalloc
@@ -156,7 +159,9 @@ set(TEST_TARGETS
     jemalloc_leak_checking
     #uv_ping_pong
     #uv_tcp_echo_server
-    beast_http_client_sync
+    beast_http_client
+    beast_http_client_coro
     beast_websocket_client_sync
+    beast_http_server
 )
 testAll()

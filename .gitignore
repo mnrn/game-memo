@@ -3,4 +3,5 @@
 /data
 /ssl
 /scripts
+/doc
 *.heap

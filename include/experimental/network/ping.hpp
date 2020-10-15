@@ -3,14 +3,14 @@
 
 #include <boost/asio.hpp>
 #include <chrono>
+#include <functional>
 #include <iomanip>
 #include <iostream>
 #include <istream>
 #include <ostream>
-#include <functional>
 
-#include "experimental/network/icmp_hdr.hpp"
-#include "experimental/network/ipv4_hdr.hpp"
+#include "experimental/network/icmp.hpp"
+#include "experimental/network/ipv4.hpp"
 
 namespace net {
 
