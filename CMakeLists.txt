@@ -38,6 +38,9 @@ if (NOT Boost_FOUND)
 else()
     #message("@@ Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
     message("@@ Boost_LIBRARY_DIRS: ${Boost_LIBRARY_DIRS}")
+    set(other_flags "${other_flags} -frtti -fvisibility-inlines-hidden")
+    set(other_flags "${other_flags} -fvisibility=hidden")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${other_flags}")
 endif()
 
 # jemalloc
@@ -161,5 +164,6 @@ set(TEST_TARGETS
     beast_http_client_async_coro
     beast_websocket_client_sync
     beast_http_server_sync
+    beast_http_server_async
 )
 testAll()
