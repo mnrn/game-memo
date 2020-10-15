@@ -159,11 +159,9 @@ set(TEST_TARGETS
     jemalloc_leak_checking
     #uv_ping_pong
     #uv_tcp_echo_server
-    beast_http_client_sync
-    beast_http_client_async
-    beast_http_client_async_coro
+    beast_http_client
+    beast_http_client_coro
     beast_websocket_client_sync
-    beast_http_server_sync
-    beast_http_server_async
+    beast_http_server
 )
 testAll()
