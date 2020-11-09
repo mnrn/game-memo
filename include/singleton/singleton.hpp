@@ -53,7 +53,13 @@ public:
   }
 
   /**< @brief インスタンスの破棄 */
-  static void destroy() { instance_.release(); }
+  static void destroy() {
+    if (instance_ != nullptr) {
+      decltype(auto) res = instance_.release();
+      delete res;
+      instance_ = nullptr;
+    }
+  }
 
   /**< @brief インスタンスが存在するか判定 */
   static bool exist() { return instance_ != nullptr; }
