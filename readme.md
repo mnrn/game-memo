@@ -61,12 +61,6 @@ STLのライブラリでまだ不安定なものが入ることが多いです�
 
 現在は上のヘッダに対して [boost-bcp] を実行したものを third-party に置いています。
 
-## TODO
-
-- Networking (WIP)
-- Synchronization
-- Support Windows (DirectX12?)
-
 ## Directory tree
 
 ```text:
